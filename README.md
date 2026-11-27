@@ -26,8 +26,6 @@ Programação Orientada a Objetos e Linguagem de Programação I (Fatec Ipiranga
    (botão **Run** em cima do `main`). Pelo terminal: `mvn compile exec:java`.
 3. Na primeira execução o sistema cria o banco `biblioteca_vila_leitura`, as tabelas e o usuário
    **`admin` / senha `admin`** (Bibliotecário). Troque a senha em *Sistema > Alterar minha senha*.
-4. (Opcional) Para ter dados de exemplo, rode `docs/seed_exemplo.sql` no banco ainda vazio
-   (MySQL Workbench ou `mysql -u root -p < seed_exemplo.sql`). Ele também cria o login `voluntario` / `1234`.
 
 ## Organização
 

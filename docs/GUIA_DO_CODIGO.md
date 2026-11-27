@@ -49,7 +49,7 @@
 | Build | Maven | `pom.xml` (mesma ideia do `poo12` do professor) |
 | Interface | Swing (`JFrame`, `JTable`, `JOptionPane`...) | pacote `ui` |
 | Visual | FlatLaf 3.6.2 (tema claro e escuro) | `ui/Estilo.java` |
-| Banco | MySQL 8.0.16+ | `dao/*` e `docs/schema_biblioteca.sql` |
+| Banco | MySQL 8.0.16+ | `dao/*` (cada DAO cria a sua tabela com `CREATE TABLE IF NOT EXISTS`) |
 | Driver JDBC | `mysql-connector-j` 8.4.0 | `pom.xml` |
 | Datas | `java.time.LocalDate` | entidades, DAOs e telas |
 | Execução | `exec-maven-plugin` (`mvn compile exec:java`) | `pom.xml` |
@@ -93,8 +93,6 @@ Biblioteca_System/
 ├── db.properties                url, usuário e senha do MySQL (não vai pro GitHub)
 ├── README.md                    como rodar e mapa menu x requisitos
 ├── docs/
-│   ├── schema_biblioteca.sql    script das 6 tabelas (opcional, o sistema cria sozinho)
-│   ├── seed_exemplo.sql         dados de exemplo (inclui login voluntario/1234)
 │   └── GUIA_DO_CODIGO.md        este guia
 └── src/main/
     ├── java/com/fatec/biblioteca/
@@ -162,7 +160,7 @@ Números para ter na ponta da língua: **22 tipos no pacote raiz** (19 classes e
    - O `db.properties` está no `.gitignore`, então a senha não vai para o GitHub.
 3. **Executar:** abra `Main.java` e clique em **Run**, ou no terminal `mvn compile exec:java`.
 4. **Primeira execução:** `BancoDados.inicializar()` cria as 6 tabelas e o usuário **admin / admin** (Bibliotecário).
-5. **Dados de exemplo (opcional):** rode `docs/seed_exemplo.sql` com o banco ainda vazio. Ele cria também o login **voluntario / 1234**, ótimo para mostrar que o Voluntário não acessa "Funcionários".
+5. **Não há script SQL para rodar:** o banco e as tabelas são criados pelo próprio programa (cada DAO tem `criarNovaTabela()` com `CREATE TABLE IF NOT EXISTS`, igual ao `poo12`). Para a demonstração, cadastre os dados pelas telas e crie um funcionário Voluntário em *Cadastros > Funcionários*, para mostrar que ele não acessa essa tela.
 
 **Como o programa acha o `db.properties`?** No bloco `static { ... }` da classe `DAO` ele tenta, nesta ordem: a pasta atual, `Biblioteca_System/db.properties`, e até 5 pastas acima de onde as classes compiladas estão. Se não achar, tenta o classpath, e se ainda assim não achar usa `root` sem senha. A origem usada é mostrada no console e na mensagem de erro de conexão.
 
@@ -176,7 +174,7 @@ Números para ter na ponta da língua: **22 tipos no pacote raiz** (19 classes e
 6. Com outro leitor, tentar emprestar a mesma obra → "não há exemplares" → fazer reserva.
 7. Devolver com data atrasada → multa calculada → mensagem "exemplar separado para a reserva".
 8. Mostrar Relatórios: Atrasos e multas, Perfil de uso, Exportar lista de cobrança.
-9. Trocar usuário para `voluntario` → botão "Funcionários" desabilitado (polimorfismo).
+9. Trocar usuário para o Voluntário que você cadastrou → botão "Funcionários" desabilitado (polimorfismo).
 10. Ligar o tema escuro em *Sistema > Tema escuro* (detalhe visual, opcional).
 
 ---
