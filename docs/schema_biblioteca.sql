@@ -1,18 +1,5 @@
--- =====================================================================
--- Biblioteca Comunitária Vila Leitura — banco MySQL (v3, datas com DATE)
--- Requer MySQL 8.0.16+ (CHECK constraints).
---
--- NÃO é obrigatório rodar este script: ao abrir, o sistema cria o banco
--- (createDatabaseIfNotExist) e cada DAO cria a sua tabela com
--- CREATE TABLE IF NOT EXISTS, como no exemplo poo12 do professor.
--- Este arquivo reúne o mesmo SQL para documentação e para montar o banco à mão.
---
--- De onde vem cada tabela:
---   livros.txt      -> obra + copia   (obra = título; copia = exemplar físico)
---   leitores.txt    -> leitor
---   emprestimos.txt -> emprestimo     (aponta para a cópia; data_devolucao NULL = em aberto)
---   (professor POO) -> funcionario, reserva
--- =====================================================================
+-- Biblioteca Comunitária Vila Leitura — MySQL 8.0.16+
+-- Opcional: o sistema cria o banco e as tabelas ao abrir (cada DAO faz CREATE TABLE IF NOT EXISTS).
 
 CREATE DATABASE IF NOT EXISTS biblioteca_vila_leitura
     CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;

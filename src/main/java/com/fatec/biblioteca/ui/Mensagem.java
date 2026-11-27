@@ -7,10 +7,6 @@ import java.util.Locale;
 
 import javax.swing.JOptionPane;
 
-/**
- * Tratamento de erros na camada de UI (requisito do professor): toda tela
- * captura as exceções e chama estes métodos para mostrar a mensagem.
- */
 public final class Mensagem {
 
     private static final Locale BR = Locale.forLanguageTag("pt-BR");

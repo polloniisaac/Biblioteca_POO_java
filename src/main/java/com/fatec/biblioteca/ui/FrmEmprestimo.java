@@ -25,7 +25,7 @@ import com.fatec.biblioteca.dao.LeitorDAO;
 import com.fatec.biblioteca.dao.ObraDAO;
 import com.fatec.biblioteca.dao.ReservaDAO;
 
-/** RF08: realizar empréstimo (RN06–RN10, RN13–RN16). */
+// RF08: realizar empréstimo (RN06–RN10, RN13–RN16).
 public class FrmEmprestimo extends JFrame {
 
     private JTextField txtLeitor;
@@ -84,7 +84,6 @@ public class FrmEmprestimo extends JFrame {
         add(painel, BorderLayout.CENTER);
         add(botoes, BorderLayout.SOUTH);
 
-        // mostra os dados assim que o usuário sai do campo (como no Cenário 1 do PDF)
         txtLeitor.addActionListener(e -> mostrarLeitor());
         txtLeitor.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
@@ -101,6 +100,8 @@ public class FrmEmprestimo extends JFrame {
         });
         btnRealizar.addActionListener(e -> realizar());
         btnLimpar.addActionListener(e -> limparCampos());
+
+        Estilo.padronizar(this);
     }
 
     private void mostrarLeitor() {

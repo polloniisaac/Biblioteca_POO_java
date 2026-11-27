@@ -2,11 +2,7 @@ package com.fatec.biblioteca;
 
 import java.time.LocalDate;
 
-/**
- * Constantes do sistema (Quadro 7.1 e "Constantes sugeridas" da especificação).
- * A política de prazo/limite por tipo de leitor NÃO fica aqui: ela está nas
- * subclasses de Leitor (polimorfismo).
- */
+// Prazo e limite por tipo de leitor ficam nas subclasses de Leitor (polimorfismo).
 public final class Constantes {
 
     private Constantes() {
@@ -21,13 +17,12 @@ public final class Constantes {
 
     public static final int ANO_MINIMO = 1450;      // RN03
 
-    /** Multa por dia de atraso (RN12). Para mudar o valor, altere só aqui. */
+    // RN12: multa por dia de atraso
     public static final double MULTA_POR_DIA = 0.50;
 
-    /** Dias que o leitor tem para retirar uma cópia separada por reserva (regra R4). */
+    // R4: dias para retirar a cópia reservada
     public static final int PRAZO_RETIRADA_RESERVA = 3;
 
-    /** Ano atual (ANO_ATUAL do PDF), lido do relógio do computador. */
     public static int anoAtual() {
         return LocalDate.now().getYear();
     }

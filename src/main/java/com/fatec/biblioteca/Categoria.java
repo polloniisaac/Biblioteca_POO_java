@@ -1,6 +1,5 @@
 package com.fatec.biblioteca;
 
-/** Categorias do acervo (domínio fixo do Quadro 7.1). */
 public enum Categoria {
     LITERATURA(1, "Literatura"),
     DIDATICO(2, "Didático"),
@@ -24,7 +23,6 @@ public enum Categoria {
         return nome;
     }
 
-    /** Índice da coluna na matriz de perfil de uso (categoria - 1). */
     public int getIndice() {
         return codigo - 1;
     }

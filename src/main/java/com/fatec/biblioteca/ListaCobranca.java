@@ -7,10 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * RF14: lista de cobrança dos empréstimos atrasados, gravada em
- * atrasos_AAAA-MM-DD.txt com BufferedWriter, String.format e newLine().
- */
 public class ListaCobranca {
 
     private final LocalDate dataReferencia;
@@ -37,7 +33,6 @@ public class ListaCobranca {
         return total;
     }
 
-    /** Texto do relatório (o mesmo que vai para o arquivo). */
     public String gerarTexto() {
         StringBuilder sb = new StringBuilder();
         sb.append("BIBLIOTECA COMUNITÁRIA VILA LEITURA - EMPRÉSTIMOS EM ATRASO (")
@@ -55,7 +50,6 @@ public class ListaCobranca {
         return sb.toString();
     }
 
-    /** Grava o arquivo (sobrescreve). Lança IOException para a tela tratar. */
     public String exportar() throws IOException {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(getNomeArquivo(), StandardCharsets.UTF_8))) {
             for (String linha : gerarTexto().split("\n")) {

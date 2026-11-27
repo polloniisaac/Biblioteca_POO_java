@@ -39,6 +39,8 @@ public class FrmConsultaFuncionarios extends JFrame {
         btnAtualizar.addActionListener(e -> carregarDados());
 
         carregarDados();
+
+        Estilo.padronizar(this);
     }
 
     private void carregarDados() {

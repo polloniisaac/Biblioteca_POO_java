@@ -14,7 +14,7 @@ import javax.swing.JTextArea;
 import com.fatec.biblioteca.Obra;
 import com.fatec.biblioteca.dao.ObraDAO;
 
-/** RF11: relatório de livros disponíveis e emprestados. */
+// RF11: relatório de livros disponíveis e emprestados.
 public class FrmRelCirculacao extends JFrame {
 
     private JTable tabela;
@@ -51,6 +51,8 @@ public class FrmRelCirculacao extends JFrame {
         btnAtualizar.addActionListener(e -> carregarDados());
 
         carregarDados();
+
+        Estilo.padronizar(this);
     }
 
     private void carregarDados() {

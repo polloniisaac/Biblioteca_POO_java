@@ -1,7 +1,6 @@
 package com.fatec.biblioteca.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.time.LocalDate;
@@ -20,7 +19,7 @@ import com.fatec.biblioteca.Datas;
 import com.fatec.biblioteca.Emprestimo;
 import com.fatec.biblioteca.dao.EmprestimoDAO;
 
-/** RF10: empréstimos em aberto, com status em relação a uma data de referência. */
+// RF10: empréstimos em aberto
 public class FrmEmprestimosAbertos extends JFrame {
 
     private JTable tabela;
@@ -43,19 +42,22 @@ public class FrmEmprestimosAbertos extends JFrame {
         criarComponentes();
 
         carregarDados();
+
+        Estilo.padronizar(this);
     }
 
     private void criarComponentes() {
         modelo = new Tabela("Código", "Título", "Exemplar", "Leitor", "Empréstimo", "Previsto", "Status");
         tabela = new JTable(modelo);
-        // linhas atrasadas em vermelho
         tabela.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object v, boolean sel, boolean foco,
                     int linha, int coluna) {
                 Component c = super.getTableCellRendererComponent(t, v, sel, foco, linha, coluna);
                 boolean atrasado = String.valueOf(t.getValueAt(linha, 6)).startsWith("ATRASADO");
-                c.setForeground(atrasado ? Color.RED : Color.BLACK);
+                if (!sel) {
+                    c.setForeground(atrasado ? Estilo.VERMELHO : t.getForeground());
+                }
                 return c;
             }
         });

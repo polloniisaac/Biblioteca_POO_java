@@ -4,13 +4,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * RF15 adaptado ao banco: cria as tabelas (na ordem das chaves estrangeiras),
- * garante um usuário administrador e confere a consistência das cópias (RN18).
- */
+// RF15: cria as tabelas, o usuário admin e confere as cópias (RN18)
 public class BancoDados {
 
-    /** Devolve as mensagens a mostrar ao usuário (avisos + resumo). */
     public List<String> inicializar() throws SQLException {
         List<String> mensagens = new ArrayList<>();
         ObraDAO obraDAO = new ObraDAO();

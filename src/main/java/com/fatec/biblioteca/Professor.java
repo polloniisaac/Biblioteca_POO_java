@@ -1,6 +1,5 @@
 package com.fatec.biblioteca;
 
-/** Leitor do tipo Professor: prazo de 14 dias, até 4 livro(s) ao mesmo tempo. */
 public class Professor extends Leitor {
 
     @Override

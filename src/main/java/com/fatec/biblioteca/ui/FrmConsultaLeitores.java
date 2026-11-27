@@ -13,7 +13,7 @@ import javax.swing.JTable;
 import com.fatec.biblioteca.Leitor;
 import com.fatec.biblioteca.dao.LeitorDAO;
 
-/** RF07: listar leitores com "empréstimos em aberto de limite". */
+// RF07: listar leitores com "empréstimos em aberto de limite".
 public class FrmConsultaLeitores extends JFrame {
 
     private JTable tabela;
@@ -35,6 +35,8 @@ public class FrmConsultaLeitores extends JFrame {
         criarComponentes();
 
         carregarDados();
+
+        Estilo.padronizar(this);
     }
 
     private void criarComponentes() {

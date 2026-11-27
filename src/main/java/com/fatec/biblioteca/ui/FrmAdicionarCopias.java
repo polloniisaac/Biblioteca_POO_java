@@ -17,7 +17,7 @@ import com.fatec.biblioteca.Validador;
 import com.fatec.biblioteca.dao.CopiaDAO;
 import com.fatec.biblioteca.dao.ObraDAO;
 
-/** RF02: adicionar exemplares (cópias) a uma obra já cadastrada. */
+// RF02: adicionar exemplares (cópias) a uma obra já cadastrada.
 public class FrmAdicionarCopias extends JFrame {
 
     private JTextField txtCodigo;
@@ -62,6 +62,8 @@ public class FrmAdicionarCopias extends JFrame {
 
         btnBuscar.addActionListener(e -> buscar());
         btnAdicionar.addActionListener(e -> adicionar());
+
+        Estilo.padronizar(this);
     }
 
     private Obra buscar() {

@@ -17,7 +17,6 @@ import com.fatec.biblioteca.PerfilUso;
 import com.fatec.biblioteca.Reserva;
 import com.fatec.biblioteca.SituacaoCopia;
 
-/** Tabela emprestimo (emprestimos.txt), agora apontando para a cópia e para o funcionário. */
 public class EmprestimoDAO extends DAO {
 
     private static final String SELECT = "SELECT e.*, c.numero, c.situacao AS copia_situacao, c.obra_codigo,"
@@ -43,7 +42,6 @@ public class EmprestimoDAO extends DAO {
                 + " data_prevista DATE NOT NULL,"
                 + " data_devolucao DATE NULL,"
                 + " multa DECIMAL(8,2) NOT NULL DEFAULT 0.00,"
-                // coluna calculada: só existe valor enquanto o empréstimo está aberto
                 + " copia_aberta INT AS (IF(data_devolucao IS NULL, copia_codigo, NULL)) STORED,"
                 + " CONSTRAINT pk_emprestimo PRIMARY KEY (codigo),"
                 + " CONSTRAINT fk_emp_copia FOREIGN KEY (copia_codigo) REFERENCES copia (codigo),"
@@ -53,16 +51,12 @@ public class EmprestimoDAO extends DAO {
                 + " CONSTRAINT ck_emp_prevista CHECK (data_prevista > data_emprestimo),"
                 + " CONSTRAINT ck_emp_devolucao CHECK (data_devolucao IS NULL OR data_devolucao >= data_emprestimo),"
                 + " CONSTRAINT ck_emp_multa CHECK (multa >= 0),"
-                // uma cópia nunca tem dois empréstimos em aberto
                 + " CONSTRAINT uk_emp_copia_aberta UNIQUE (copia_aberta),"
                 + " INDEX idx_emp_leitor_aberto (leitor_codigo, data_devolucao)"
                 + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
     }
 
-    /**
-     * RF08: grava o empréstimo, a nova situação da cópia e (se houver) a reserva
-     * atendida, tudo na mesma transação (RN13/RN16). Preenche o código gerado.
-     */
+    // RF08: empréstimo, cópia e reserva na mesma transação (RN13/RN16)
     public int registrarEmprestimo(Emprestimo emp, Reserva reservaAtendida) throws SQLException {
         String sql = "INSERT INTO emprestimo(copia_codigo, leitor_codigo, funcionario_emprestimo,"
                 + " data_emprestimo, data_prevista) VALUES(?, ?, ?, ?, ?)";
@@ -93,11 +87,7 @@ public class EmprestimoDAO extends DAO {
         }
     }
 
-    /**
-     * RF09: grava a devolução e a cópia. Se a obra tiver fila de reservas, a
-     * cópia já é separada para o primeiro da fila (R4). Devolve as reservas
-     * que receberam cópia (lista vazia se nenhuma).
-     */
+    // RF09: devolução; se houver fila, separa a cópia para o próximo (R4)
     public List<Reserva> registrarDevolucao(Emprestimo emp) throws SQLException {
         String sql = "UPDATE emprestimo SET data_devolucao=?, multa=?, funcionario_devolucao=?"
                 + " WHERE codigo=? AND data_devolucao IS NULL";
@@ -123,46 +113,44 @@ public class EmprestimoDAO extends DAO {
         }
     }
 
-    /** Carrega um empréstimo pelo código, ou null. */
     public Emprestimo carregar(int codigo) throws SQLException {
         List<Emprestimo> l = consultar(" WHERE e.codigo = " + codigo, null);
         return l.isEmpty() ? null : l.get(0);
     }
 
-    /** Empréstimos em aberto do leitor (para a agregação Leitor -> Emprestimo). */
+    // Empréstimos em aberto do leitor (para a agregação Leitor -> Emprestimo).
     public List<Emprestimo> listarAbertosPorLeitor(Leitor leitor) throws SQLException {
         return consultar(" WHERE e.data_devolucao IS NULL AND e.leitor_codigo = " + leitor.getCodigo()
                 + " ORDER BY e.data_prevista", leitor);
     }
 
-    /** RF04: empréstimos em aberto de uma obra. */
+    // RF04: empréstimos em aberto de uma obra.
     public List<Emprestimo> listarAbertosPorObra(int codigoObra) throws SQLException {
         return consultar(" WHERE e.data_devolucao IS NULL AND c.obra_codigo = " + codigoObra
                 + " ORDER BY e.codigo", null);
     }
 
-    /** RF10. */
+    // RF10.
     public List<Emprestimo> listarAbertos() throws SQLException {
         return consultar(" WHERE e.data_devolucao IS NULL ORDER BY e.codigo", null);
     }
 
-    /** RF12 (b) e RF14: em aberto e atrasados na data de referência. */
+    // RF12 (b) e RF14: em aberto e atrasados na data de referência.
     public List<Emprestimo> listarAtrasados(LocalDate referencia) throws SQLException {
         return consultar(" WHERE e.data_devolucao IS NULL AND e.data_prevista < '" + referencia + "'"
                 + " ORDER BY e.codigo", null);
     }
 
-    /** RF12 (a): devolvidos com multa maior que zero. */
+    // RF12 (a): devolvidos com multa maior que zero.
     public List<Emprestimo> listarDevolvidosComMulta() throws SQLException {
         return consultar(" WHERE e.data_devolucao IS NOT NULL AND e.multa > 0 ORDER BY e.codigo", null);
     }
 
-    /** Histórico completo. */
     public List<Emprestimo> listar() throws SQLException {
         return consultar(" ORDER BY e.codigo", null);
     }
 
-    /** RF13: monta a matriz tipo de leitor x categoria com todos os empréstimos. */
+    // RF13: monta a matriz tipo de leitor x categoria com todos os empréstimos.
     public PerfilUso carregarPerfilUso() throws SQLException {
         PerfilUso perfil = new PerfilUso();
         String sql = "SELECT l.tipo, o.categoria, COUNT(*) AS qtd FROM emprestimo e"
@@ -187,7 +175,7 @@ public class EmprestimoDAO extends DAO {
         }
     }
 
-    /** Próximo código que o banco vai gerar (resumo do RF15). */
+    // Próximo código que o banco vai gerar (resumo do RF15).
     public int proximoCodigo() throws SQLException {
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery("SELECT COALESCE(MAX(codigo), 0) + 1 FROM emprestimo");

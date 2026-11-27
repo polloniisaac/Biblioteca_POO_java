@@ -7,11 +7,14 @@ import javax.swing.JOptionPane;
 
 import com.fatec.biblioteca.dao.BancoDados;
 import com.fatec.biblioteca.dao.DAO;
+import com.fatec.biblioteca.ui.Estilo;
 import com.fatec.biblioteca.ui.FrmLogin;
 
 public class Main {
     public static void main(String[] args) {
-        // RF15: cria as tabelas, confere a consistência e mostra o resumo
+
+        Estilo.iniciar();
+
         try {
             List<String> mensagens = new BancoDados().inicializar();
             JOptionPane.showMessageDialog(null, String.join("\n", mensagens),

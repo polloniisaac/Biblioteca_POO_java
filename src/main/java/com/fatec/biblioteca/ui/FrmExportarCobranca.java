@@ -20,7 +20,7 @@ import com.fatec.biblioteca.Emprestimo;
 import com.fatec.biblioteca.ListaCobranca;
 import com.fatec.biblioteca.dao.EmprestimoDAO;
 
-/** RF14: exportar a lista de cobrança para atrasos_AAAA-MM-DD.txt. */
+// RF14: exportar a lista de cobrança para atrasos_AAAA-MM-DD.txt.
 public class FrmExportarCobranca extends JFrame {
 
     private JTextField txtData;
@@ -53,6 +53,8 @@ public class FrmExportarCobranca extends JFrame {
         add(new JScrollPane(txtPrevia), BorderLayout.CENTER);
 
         btnExportar.addActionListener(e -> exportar());
+
+        Estilo.padronizar(this);
     }
 
     private void exportar() {

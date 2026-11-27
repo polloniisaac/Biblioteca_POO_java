@@ -10,7 +10,6 @@ import java.util.List;
 
 import com.fatec.biblioteca.Funcionario;
 
-/** Tabela funcionario (pedido do professor de POO). Senha guardada como hash SHA-256. */
 public class FuncionarioDAO extends DAO {
 
     @Override
@@ -28,7 +27,6 @@ public class FuncionarioDAO extends DAO {
                 + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
     }
 
-    /** Primeira execução: cria o usuário admin/admin (Bibliotecário). Devolve true se criou. */
     public boolean garantirAdministrador() throws SQLException {
         if (contar() > 0) {
             return false;
@@ -66,7 +64,6 @@ public class FuncionarioDAO extends DAO {
         }
     }
 
-    /** Altera nome, cargo e login. A senha só muda se senhaHash não for null. */
     public int alterar(Funcionario obj) throws SQLException {
         boolean trocaSenha = obj.getSenhaHash() != null;
         String sql = "UPDATE funcionario SET nome=?, cargo=?, login=?" + (trocaSenha ? ", senha_hash=?" : "")

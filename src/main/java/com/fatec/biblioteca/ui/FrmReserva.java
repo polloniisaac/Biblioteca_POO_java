@@ -23,7 +23,7 @@ import com.fatec.biblioteca.dao.LeitorDAO;
 import com.fatec.biblioteca.dao.ObraDAO;
 import com.fatec.biblioteca.dao.ReservaDAO;
 
-/** Reservar obra sem exemplar disponível e cancelar reserva (regras R1–R7). */
+// Reservar obra sem exemplar disponível e cancelar reserva (regras R1–R7).
 public class FrmReserva extends JFrame {
 
     private JTextField txtLeitor;
@@ -81,6 +81,8 @@ public class FrmReserva extends JFrame {
         btnReservar.addActionListener(e -> reservar());
         btnCancelar.addActionListener(e -> cancelar());
         btnListar.addActionListener(e -> new FrmConsultaReservas().setVisible(true));
+
+        Estilo.padronizar(this);
     }
 
     private void reservar() {

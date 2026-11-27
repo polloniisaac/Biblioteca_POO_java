@@ -1,6 +1,5 @@
 package com.fatec.biblioteca;
 
-/** Guarda o funcionário que fez login. */
 public final class Sessao {
 
     private static Funcionario funcionario;

@@ -14,7 +14,6 @@ import com.fatec.biblioteca.Funcionario;
 import com.fatec.biblioteca.Sessao;
 import com.fatec.biblioteca.dao.FuncionarioDAO;
 
-/** O funcionário logado troca a própria senha. */
 public class FrmAlterarSenha extends JFrame {
 
     private JPasswordField txtAtual;
@@ -53,6 +52,8 @@ public class FrmAlterarSenha extends JFrame {
         add(botoes, BorderLayout.SOUTH);
 
         btnSalvar.addActionListener(e -> salvar());
+
+        Estilo.padronizar(this);
     }
 
     private void salvar() {

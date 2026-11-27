@@ -19,7 +19,7 @@ import com.fatec.biblioteca.Sessao;
 import com.fatec.biblioteca.Validador;
 import com.fatec.biblioteca.dao.EmprestimoDAO;
 
-/** RF09: registrar devolução (RN11–RN13, RN15) e passar a cópia para a fila de reservas (R4). */
+// RF09: registrar devolução (RN11–RN13, RN15, R4)
 public class FrmDevolucao extends JFrame {
 
     private JTextField txtCodigo;
@@ -63,6 +63,8 @@ public class FrmDevolucao extends JFrame {
         txtCodigo.addActionListener(e -> buscar());
         btnBuscar.addActionListener(e -> buscar());
         btnRegistrar.addActionListener(e -> registrar());
+
+        Estilo.padronizar(this);
     }
 
     private Emprestimo buscar() {
@@ -89,7 +91,7 @@ public class FrmDevolucao extends JFrame {
             }
             LocalDate data = Datas.converter(txtData.getText());
             emp.registrarDevolucao(data, Sessao.getFuncionario());    // RN11, RN12
-            List<Reserva> separadas = dao.registrarDevolucao(emp);     // transação + fila de reservas
+            List<Reserva> separadas = dao.registrarDevolucao(emp);
 
             int atraso = emp.calcularDiasAtraso();
             String msg = atraso > 0

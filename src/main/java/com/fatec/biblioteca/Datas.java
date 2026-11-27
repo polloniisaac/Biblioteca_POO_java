@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 
-/** Conversão de datas digitadas na tela (dd/MM/aaaa) para LocalDate e vice-versa. */
 public final class Datas {
 
     private static final DateTimeFormatter FORMATO =

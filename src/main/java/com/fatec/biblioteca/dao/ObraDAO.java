@@ -15,7 +15,6 @@ import com.fatec.biblioteca.Copia;
 import com.fatec.biblioteca.Obra;
 import com.fatec.biblioteca.SituacaoCopia;
 
-/** Tabela obra (parte "título" do livros.txt). As cópias ficam em CopiaDAO. */
 public class ObraDAO extends DAO {
 
     @Override
@@ -35,7 +34,7 @@ public class ObraDAO extends DAO {
                 + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
     }
 
-    /** RF01: grava a obra e as cópias iniciais na mesma transação. */
+    // RF01: grava a obra e as cópias iniciais na mesma transação.
     public int inserir(Obra obj, List<Copia> copias) throws SQLException {
         String sql = "INSERT INTO obra(codigo, titulo, autor, categoria, ano_publicacao) VALUES(?, ?, ?, ?, ?)";
         try (Connection conn = getConnection()) {
@@ -73,7 +72,6 @@ public class ObraDAO extends DAO {
         }
     }
 
-    /** Remove a obra e suas cópias. A tela verifica antes possuiMovimentacao(). */
     public int remover(int codigo) throws SQLException {
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
@@ -92,7 +90,6 @@ public class ObraDAO extends DAO {
         }
     }
 
-    /** A obra já teve empréstimo ou reserva? (então não pode ser excluída) */
     public boolean possuiMovimentacao(int codigo) throws SQLException {
         String sql = "SELECT (SELECT COUNT(*) FROM emprestimo e JOIN copia c ON c.codigo = e.copia_codigo"
                 + " WHERE c.obra_codigo = ?) + (SELECT COUNT(*) FROM reserva WHERE obra_codigo = ?)";
@@ -106,14 +103,12 @@ public class ObraDAO extends DAO {
         }
     }
 
-    /** Carrega a obra com cópias e fila de reservas, ou null se não existir. */
     public Obra carregar(int codigo) throws SQLException {
         try (Connection conn = getConnection()) {
             return carregar(conn, codigo);
         }
     }
 
-    /** Versão que usa uma conexão já aberta (para transações). */
     public Obra carregar(Connection conn, int codigo) throws SQLException {
         Obra obj = null;
         try (PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM obra WHERE codigo=?")) {
@@ -130,7 +125,7 @@ public class ObraDAO extends DAO {
         return obj;
     }
 
-    /** RF03/RF05: lista as obras (com cópias) ordenadas por título. categoria null = todas. */
+    // RF03/RF05: categoria null = todas
     public List<Obra> listar(Categoria categoria) throws SQLException {
         List<Obra> lista = new ArrayList<>();
         Map<Integer, Obra> porCodigo = new HashMap<>();

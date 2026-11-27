@@ -1,10 +1,5 @@
 package com.fatec.biblioteca;
 
-/**
- * Matriz de perfil de uso (Seção 7.3): linha = tipo de leitor, coluna = categoria.
- * Conta todos os empréstimos realizados (abertos e devolvidos).
- * Empate: vale a primeira categoria encontrada na varredura da linha/colunas.
- */
 public class PerfilUso {
 
     public static final String[] NOMES_TIPOS = { "Estudante", "Professor", "Comunidade" };
@@ -43,7 +38,6 @@ public class PerfilUso {
         return soma;
     }
 
-    /** Categoria mais emprestada por um tipo de leitor (índice da linha), ou null se não houver. */
     public Categoria categoriaPreferida(int linha) {
         int maior = 0;
         int indice = -1;
@@ -56,7 +50,6 @@ public class PerfilUso {
         return indice < 0 ? null : Categoria.values()[indice];
     }
 
-    /** Categoria com maior soma de coluna, ou null se não houver empréstimos. */
     public Categoria categoriaMaisProcurada() {
         int maior = 0;
         int indice = -1;

@@ -13,7 +13,6 @@ import com.fatec.biblioteca.Copia;
 import com.fatec.biblioteca.Obra;
 import com.fatec.biblioteca.SituacaoCopia;
 
-/** Tabela copia: cada exemplar físico (TOTAL/DISPONIVEIS do livros.txt viram contagens daqui). */
 public class CopiaDAO extends DAO {
 
     @Override
@@ -31,7 +30,6 @@ public class CopiaDAO extends DAO {
                 + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
     }
 
-    /** Insere uma cópia dentro de uma transação já aberta e preenche o código gerado. */
     public void inserir(Connection conn, Copia c) throws SQLException {
         String sql = "INSERT INTO copia(obra_codigo, numero, situacao) VALUES(?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -46,10 +44,7 @@ public class CopiaDAO extends DAO {
         }
     }
 
-    /**
-     * RF02: grava as cópias novas e, se houver fila de reservas, já separa
-     * as cópias para os primeiros da fila. Devolve quantas foram separadas.
-     */
+    // RF02: grava as cópias e já separa para a fila de reservas
     public int adicionarCopias(Obra obra, List<Copia> novas) throws SQLException {
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
@@ -75,7 +70,7 @@ public class CopiaDAO extends DAO {
         }
     }
 
-    /** Preenche a lista de cópias da obra (composição). */
+    // Preenche a lista de cópias da obra (composição).
     public void carregarCopias(Connection conn, Obra obra) throws SQLException {
         String sql = "SELECT * FROM copia WHERE obra_codigo=? ORDER BY numero";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -91,11 +86,7 @@ public class CopiaDAO extends DAO {
         }
     }
 
-    /**
-     * RF15 / RN18 adaptada: a situação gravada de cada cópia deve bater com os
-     * empréstimos em aberto e as reservas aguardando retirada. Corrige e devolve
-     * um aviso para cada divergência.
-     */
+    // RF15 / RN18: confere a situação de cada cópia
     public List<String> verificarConsistencia() throws SQLException {
         List<String> avisos = new ArrayList<>();
         String sql = "SELECT c.codigo, c.obra_codigo, c.numero, c.situacao,"

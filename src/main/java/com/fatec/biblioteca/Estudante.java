@@ -1,8 +1,8 @@
 package com.fatec.biblioteca;
 
-/** Leitor do tipo Estudante: prazo de 7 dias, até 2 livro(s) ao mesmo tempo. */
 public class Estudante extends Leitor {
 
+    
     @Override
     public int getTipo() {
         return ESTUDANTE;

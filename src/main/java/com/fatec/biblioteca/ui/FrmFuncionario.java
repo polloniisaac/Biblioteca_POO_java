@@ -17,7 +17,6 @@ import com.fatec.biblioteca.Sessao;
 import com.fatec.biblioteca.Validador;
 import com.fatec.biblioteca.dao.FuncionarioDAO;
 
-/** Cadastro de funcionários (só para Bibliotecário). */
 public class FrmFuncionario extends JFrame {
 
     private JTextField txtCodigo;
@@ -86,6 +85,8 @@ public class FrmFuncionario extends JFrame {
         add(botoes, BorderLayout.SOUTH);
 
         configurarEventos();
+
+        Estilo.padronizar(this);
     }
 
     private void configurarEventos() {

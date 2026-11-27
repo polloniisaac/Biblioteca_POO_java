@@ -5,7 +5,6 @@ Programação Orientada a Objetos e Linguagem de Programação I (Fatec Ipiranga
 
 - Regras de negócio: `Especificacao_Projeto_SistemBibliotecario.pdf` (Tema 4), adaptadas para banco de dados e telas.
 - Estrutura: igual ao exemplo `poo12` do professor (Maven, entidades na raiz do pacote, `dao/` e as telas Swing em `ui/Frm*`).
-- Proposta, decisões e diagramas: [`docs/PROPOSTA_ARQUITETURA.md`](docs/PROPOSTA_ARQUITETURA.md).
 
 ## Pré-requisitos
 
@@ -15,7 +14,13 @@ Programação Orientada a Objetos e Linguagem de Programação I (Fatec Ipiranga
 
 ## Como rodar
 
-1. Copie `db.properties.exemplo` para `db.properties` (na mesma pasta do `pom.xml`) e coloque o usuário e a senha do seu MySQL.
+1. Crie um arquivo `db.properties` na mesma pasta do `pom.xml` com o conteúdo abaixo, trocando `usuario` e `senha` pelos do seu MySQL:
+
+   ```properties
+   url=jdbc:mysql://localhost:3306/biblioteca_vila_leitura?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo
+   usuario=root
+   senha=
+   ```
    O `db.properties` não vai para o GitHub (está no `.gitignore`).
 2. Abra a pasta `Biblioteca_System` no VS Code, espere o Maven baixar o driver e rode `com.fatec.biblioteca.Main`
    (botão **Run** em cima do `main`). Pelo terminal: `mvn compile exec:java`.

@@ -15,7 +15,6 @@ import com.fatec.biblioteca.Reserva;
 import com.fatec.biblioteca.SituacaoCopia;
 import com.fatec.biblioteca.SituacaoReserva;
 
-/** Tabela reserva (pedido do professor de POO). Regras R1–R7 no documento de proposta. */
 public class ReservaDAO extends DAO {
 
     private static final String SELECT = "SELECT r.*, l.nome AS leitor_nome, l.tipo AS leitor_tipo,"
@@ -39,7 +38,6 @@ public class ReservaDAO extends DAO {
                 + " data_limite_retirada DATE NULL,"
                 + " emprestimo_codigo INT NULL,"
                 + " situacao VARCHAR(20) NOT NULL DEFAULT 'ATIVA',"
-                // colunas calculadas: só têm valor enquanto a reserva está viva
                 + " viva_leitor INT AS (IF(situacao IN ('ATIVA','AGUARDANDO'), leitor_codigo, NULL)) STORED,"
                 + " viva_obra INT AS (IF(situacao IN ('ATIVA','AGUARDANDO'), obra_codigo, NULL)) STORED,"
                 + " CONSTRAINT pk_reserva PRIMARY KEY (codigo),"
@@ -50,7 +48,6 @@ public class ReservaDAO extends DAO {
                 + " CONSTRAINT fk_res_emp FOREIGN KEY (emprestimo_codigo) REFERENCES emprestimo (codigo),"
                 + " CONSTRAINT ck_res_situacao CHECK (situacao IN"
                 + "   ('ATIVA','AGUARDANDO','ATENDIDA','CANCELADA','EXPIRADA')),"
-                // um leitor só tem uma reserva viva por obra
                 + " CONSTRAINT uk_res_viva UNIQUE (viva_leitor, viva_obra),"
                 + " INDEX idx_res_fila (obra_codigo, situacao, codigo)"
                 + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
@@ -76,7 +73,6 @@ public class ReservaDAO extends DAO {
         }
     }
 
-    /** Grava situação, cópia separada, prazo e empréstimo da reserva (dentro de transação). */
     public void atualizar(Connection conn, Reserva r) throws SQLException {
         String sql = "UPDATE reserva SET situacao=?, copia_codigo=?, data_limite_retirada=?, emprestimo_codigo=?"
                 + " WHERE codigo=?";
@@ -90,7 +86,7 @@ public class ReservaDAO extends DAO {
         }
     }
 
-    /** R7: grava o cancelamento (a tela já chamou reserva.cancelar()) e anda a fila. */
+    // R7: grava o cancelamento e anda a fila
     public List<Reserva> salvarCancelamento(Reserva r, LocalDate data) throws SQLException {
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
@@ -109,13 +105,7 @@ public class ReservaDAO extends DAO {
         }
     }
 
-    /**
-     * Coração das regras R4 e R6, chamado dentro de uma transação:
-     * 1) expira as reservas AGUARDANDO com prazo vencido e libera a cópia;
-     * 2) enquanto houver cópia DISPONIVEL e reserva ATIVA na fila, separa a
-     *    cópia para o próximo da fila (prazo = data + 3 dias).
-     * Devolve as reservas que receberam cópia agora.
-     */
+    // R4 e R6: expira reservas vencidas e separa cópias para a fila
     public List<Reserva> atualizarFila(Connection conn, int codigoObra, LocalDate data) throws SQLException {
         List<Reserva> separadas = new ArrayList<>();
         Obra obra = new ObraDAO().carregar(conn, codigoObra);
@@ -156,7 +146,7 @@ public class ReservaDAO extends DAO {
         return separadas;
     }
 
-    /** R6: expira, em todas as obras, as reservas com prazo de retirada vencido na data. */
+    // R6: expira as reservas com prazo de retirada vencido
     public void expirarVencidas(LocalDate data) throws SQLException {
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
@@ -181,7 +171,7 @@ public class ReservaDAO extends DAO {
         }
     }
 
-    /** Preenche a fila de reservas vivas da obra (agregação), em ordem de chegada. */
+    // Preenche a fila de reservas vivas da obra (agregação), em ordem de chegada.
     public void carregarFila(Connection conn, Obra obra) throws SQLException {
         String sql = SELECT + " WHERE r.obra_codigo = ? AND r.situacao IN ('ATIVA','AGUARDANDO') ORDER BY r.codigo";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -193,7 +183,6 @@ public class ReservaDAO extends DAO {
         }
     }
 
-    /** Carrega uma reserva viva (com a obra completa), ou null se não existir ou já tiver encerrado. */
     public Reserva carregarViva(int codigo) throws SQLException {
         int codigoObra;
         try (Connection conn = getConnection();
@@ -214,7 +203,6 @@ public class ReservaDAO extends DAO {
         return null;
     }
 
-    /** Lista reservas (todas ou só as vivas), por obra e ordem de chegada. */
     public List<Reserva> listar(boolean somenteVivas) throws SQLException {
         List<Reserva> lista = new ArrayList<>();
         String sql = SELECT + (somenteVivas ? " WHERE r.situacao IN ('ATIVA','AGUARDANDO')" : "")
@@ -241,7 +229,7 @@ public class ReservaDAO extends DAO {
         int copia = rs.getInt("copia_codigo");
         if (!rs.wasNull()) {
             Copia c = obra.getCopia(copia);
-            if (c == null) { // obra carregada sem as cópias (listagem)
+            if (c == null) {
                 c = new Copia();
                 c.setCodigo(copia);
                 c.setNumero(rs.getInt("copia_numero"));

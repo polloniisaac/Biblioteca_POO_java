@@ -21,7 +21,7 @@ import com.fatec.biblioteca.Leitor;
 import com.fatec.biblioteca.Validador;
 import com.fatec.biblioteca.dao.LeitorDAO;
 
-/** RF06 (cadastrar leitor), consultar, alterar e excluir. */
+// RF06 (cadastrar leitor), consultar, alterar e excluir.
 public class FrmLeitor extends JFrame {
 
     private JTextField txtCodigo;
@@ -86,6 +86,8 @@ public class FrmLeitor extends JFrame {
         add(botoes, BorderLayout.SOUTH);
 
         configurarEventos();
+
+        Estilo.padronizar(this);
     }
 
     private void configurarEventos() {
@@ -97,7 +99,6 @@ public class FrmLeitor extends JFrame {
         btnListar.addActionListener(e -> new FrmConsultaLeitores().setVisible(true));
     }
 
-    /** A fábrica Leitor.criar() devolve Estudante, Professor ou Comunidade. */
     private Leitor lerCampos() throws Exception {
         Leitor leitor = Leitor.criar(cbTipo.getSelectedIndex() + 1);
         leitor.setCodigo(Validador.inteiro(txtCodigo.getText(), "Código"));

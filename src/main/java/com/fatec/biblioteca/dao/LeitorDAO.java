@@ -10,7 +10,6 @@ import java.util.List;
 
 import com.fatec.biblioteca.Leitor;
 
-/** Tabela leitor (leitores.txt). Empréstimos em aberto são contados, não gravados. */
 public class LeitorDAO extends DAO {
 
     @Override
@@ -77,7 +76,7 @@ public class LeitorDAO extends DAO {
         }
     }
 
-    /** Carrega o leitor com a lista dos empréstimos em aberto (agregação), ou null. */
+    // Carrega o leitor com a lista dos empréstimos em aberto (agregação), ou null.
     public Leitor carregar(int codigo) throws SQLException {
         Leitor obj = null;
         try (Connection conn = getConnection();
@@ -94,7 +93,7 @@ public class LeitorDAO extends DAO {
         return obj;
     }
 
-    /** RF07: leitores com a quantidade de empréstimos em aberto. */
+    // RF07: leitores com a quantidade de empréstimos em aberto.
     public List<Leitor> listar() throws SQLException {
         List<Leitor> lista = new ArrayList<>();
         String sql = "SELECT l.*, (SELECT COUNT(*) FROM emprestimo e WHERE e.leitor_codigo = l.codigo"

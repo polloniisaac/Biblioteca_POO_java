@@ -1,6 +1,5 @@
 package com.fatec.biblioteca;
 
-/** Leitor do tipo Comunidade: prazo de 7 dias, até 1 livro(s) ao mesmo tempo. */
 public class Comunidade extends Leitor {
 
     @Override

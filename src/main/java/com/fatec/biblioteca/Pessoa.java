@@ -1,6 +1,6 @@
 package com.fatec.biblioteca;
 
-/** Superclasse abstrata de Leitor e Funcionario (herança). */
+// Superclasse abstrata de Leitor e Funcionario (herança).
 public abstract class Pessoa {
 
     private int codigo;
@@ -18,12 +18,11 @@ public abstract class Pessoa {
         return nome;
     }
 
-    /** RN02/RN05 e V4.10: nome obrigatório e sem ";". */
+    // RN02/RN05 e V4.10: nome obrigatório e sem ";".
     public void setNome(String nome) throws Exception {
         this.nome = Validador.textoObrigatorio(nome, "Nome");
     }
 
-    /** Ex.: "Estudante", "Bibliotecário". Cada subclasse responde do seu jeito. */
     public abstract String getDescricaoTipo();
 
     @Override

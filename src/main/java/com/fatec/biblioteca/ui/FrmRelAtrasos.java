@@ -18,7 +18,7 @@ import com.fatec.biblioteca.Datas;
 import com.fatec.biblioteca.Emprestimo;
 import com.fatec.biblioteca.dao.EmprestimoDAO;
 
-/** RF12: (a) multas já cobradas e (b) multas previstas na data de referência. */
+// RF12: (a) multas já cobradas e (b) multas previstas na data de referência.
 public class FrmRelAtrasos extends JFrame {
 
     private Tabela modeloCobradas;
@@ -63,6 +63,8 @@ public class FrmRelAtrasos extends JFrame {
         txtData.addActionListener(e -> gerar());
 
         gerar();
+
+        Estilo.padronizar(this);
     }
 
     private JPanel secao(String titulo, Tabela modelo, JLabel rodape) {

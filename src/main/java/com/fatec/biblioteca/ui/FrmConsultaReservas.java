@@ -15,7 +15,6 @@ import com.fatec.biblioteca.Datas;
 import com.fatec.biblioteca.Reserva;
 import com.fatec.biblioteca.dao.ReservaDAO;
 
-/** Lista as reservas com a posição de cada uma na fila da obra. */
 public class FrmConsultaReservas extends JFrame {
 
     private JTable tabela;
@@ -50,6 +49,8 @@ public class FrmConsultaReservas extends JFrame {
         chkVivas.addActionListener(e -> carregarDados());
 
         carregarDados();
+
+        Estilo.padronizar(this);
     }
 
     private void carregarDados() {

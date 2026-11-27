@@ -1,10 +1,6 @@
 package com.fatec.biblioteca;
 
-/**
- * Exemplar físico de uma obra. Faz parte da Obra (composição): só é criado
- * por Obra.adicionarCopias(). A situação só muda pelos métodos abaixo
- * (encapsulamento), o que garante a RN15.
- */
+// Parte da Obra (composição); a situação só muda pelos métodos (RN15).
 public class Copia {
 
     private int codigo;
@@ -12,7 +8,6 @@ public class Copia {
     private int numero;
     private SituacaoCopia situacao = SituacaoCopia.DISPONIVEL;
 
-    /** Usado pelo DAO. */
     public Copia() {
     }
 
@@ -35,7 +30,6 @@ public class Copia {
         situacao = SituacaoCopia.DISPONIVEL;
     }
 
-    /** Separa a cópia para uma reserva. */
     public void reservar() throws Exception {
         if (situacao != SituacaoCopia.DISPONIVEL) {
             throw new Exception("A cópia " + getEtiqueta() + " não está disponível para reserva.");
@@ -43,14 +37,12 @@ public class Copia {
         situacao = SituacaoCopia.RESERVADA;
     }
 
-    /** Desfaz a separação (reserva cancelada ou expirada). */
     public void liberar() {
         if (situacao == SituacaoCopia.RESERVADA) {
             situacao = SituacaoCopia.DISPONIVEL;
         }
     }
 
-    /** Ex.: "101-2" (código da obra - número da cópia). */
     public String getEtiqueta() {
         return (obra == null ? "?" : String.valueOf(obra.getCodigo())) + "-" + numero;
     }
@@ -83,7 +75,6 @@ public class Copia {
         return situacao;
     }
 
-    /** Usado pelo DAO ao carregar do banco. */
     public void setSituacao(SituacaoCopia situacao) {
         this.situacao = situacao;
     }

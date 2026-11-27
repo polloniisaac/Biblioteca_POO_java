@@ -3,12 +3,6 @@ package com.fatec.biblioteca;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Obra (título) do acervo: o "livro" da especificação.
- * Composição: a obra possui suas cópias (List<Copia>).
- * Agregação: a obra guarda a fila de reservas vivas (List<Reserva>).
- * Total e disponíveis do PDF são calculados a partir das cópias.
- */
 public class Obra {
 
     private int codigo;
@@ -19,9 +13,6 @@ public class Obra {
     private final List<Copia> copias = new ArrayList<>();
     private final List<Reserva> filaReservas = new ArrayList<>();
 
-    // ---------- validações nos setters (estilo poo12) ----------
-
-    /** RN01: código de 100 a 9999. */
     public void setCodigo(int codigo) throws Exception {
         if (codigo < 100 || codigo > 9999) {
             throw new Exception("O código do livro deve ser de 100 a 9999.");
@@ -29,17 +20,14 @@ public class Obra {
         this.codigo = codigo;
     }
 
-    /** RN02. */
     public void setTitulo(String titulo) throws Exception {
         this.titulo = Validador.textoObrigatorio(titulo, "Título");
     }
 
-    /** RN02. */
     public void setAutor(String autor) throws Exception {
         this.autor = Validador.textoObrigatorio(autor, "Autor");
     }
 
-    /** RN03. */
     public void setCategoria(Categoria categoria) throws Exception {
         if (categoria == null) {
             throw new Exception("Escolha a categoria.");
@@ -47,7 +35,6 @@ public class Obra {
         this.categoria = categoria;
     }
 
-    /** RN03: ano entre 1450 e o ano atual. */
     public void setAnoPublicacao(int ano) throws Exception {
         if (ano < Constantes.ANO_MINIMO || ano > Constantes.anoAtual()) {
             throw new Exception("O ano de publicação deve estar entre " + Constantes.ANO_MINIMO
@@ -56,12 +43,6 @@ public class Obra {
         this.anoPublicacao = ano;
     }
 
-    // ---------- cópias (composição) ----------
-
-    /**
-     * RN04 / RF01 / RF02: cria de 1 a 50 cópias novas, numeradas na sequência.
-     * Devolve só as cópias novas, para o DAO gravar.
-     */
     public List<Copia> adicionarCopias(int quantidade) throws Exception {
         if (quantidade < Constantes.EXEMPLARES_MIN || quantidade > Constantes.EXEMPLARES_MAX) {
             throw new Exception("A quantidade de exemplares deve ser de " + Constantes.EXEMPLARES_MIN
@@ -80,7 +61,6 @@ public class Obra {
         return novas;
     }
 
-    /** Usado pelo DAO ao carregar as cópias do banco. */
     public void adicionarCopiaCarregada(Copia copia) {
         copia.setObra(this);
         copias.add(copia);
@@ -121,10 +101,6 @@ public class Obra {
         return null;
     }
 
-    /**
-     * RN06 + reserva (R5): se o leitor tem uma cópia separada para ele, é ela;
-     * senão, a primeira cópia disponível. Sem nenhuma, lança exceção.
-     */
     public Copia getCopiaParaEmprestimo(Leitor leitor) throws Exception {
         Reserva r = getReservaAguardando(leitor);
         if (r != null && r.getCopiaSeparada() != null) {
@@ -139,8 +115,6 @@ public class Obra {
         throw new Exception("Não há exemplares disponíveis deste livro" + extra + ".\n"
                 + "Se quiser, faça uma reserva.");
     }
-
-    // ---------- reservas (agregação) ----------
 
     public List<Reserva> getFilaReservas() {
         return filaReservas;
@@ -160,7 +134,6 @@ public class Obra {
         return (r != null && r.getSituacao() == SituacaoReserva.AGUARDANDO) ? r : null;
     }
 
-    /** Posição (1, 2, 3...) da reserva na fila, ou 0 se não estiver nela. */
     public int getPosicaoNaFila(Reserva reserva) {
         int pos = 0;
         for (Reserva r : filaReservas) {
@@ -173,8 +146,6 @@ public class Obra {
         }
         return 0;
     }
-
-    // ---------- getters ----------
 
     public int getCodigo() {
         return codigo;

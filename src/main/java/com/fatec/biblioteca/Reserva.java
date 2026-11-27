@@ -2,11 +2,7 @@ package com.fatec.biblioteca;
 
 import java.time.LocalDate;
 
-/**
- * Reserva de uma obra sem cópia disponível (pedido do professor de POO).
- * Associação com Obra, Leitor e Funcionario.
- * Ciclo: ATIVA (fila) -> AGUARDANDO (cópia separada) -> ATENDIDA | EXPIRADA | CANCELADA.
- */
+// Associação com Obra, Leitor e Funcionario.
 public class Reserva {
 
     private int codigo;
@@ -19,7 +15,6 @@ public class Reserva {
     private int codigoEmprestimo;
     private SituacaoReserva situacao = SituacaoReserva.ATIVA;
 
-    /** Usado pelo DAO. */
     public Reserva() {
     }
 
@@ -33,7 +28,7 @@ public class Reserva {
         this.dataReserva = data;
     }
 
-    /** R4: separa a cópia para o leitor, que tem PRAZO_RETIRADA_RESERVA dias para retirar. */
+    // R4: separa a cópia para o leitor retirar
     public void separarCopia(Copia copia, LocalDate data) throws Exception {
         if (situacao != SituacaoReserva.ATIVA) {
             throw new Exception("Só é possível separar cópia para reserva ativa.");
@@ -44,12 +39,12 @@ public class Reserva {
         this.situacao = SituacaoReserva.AGUARDANDO;
     }
 
-    /** R6: passou do prazo de retirada? */
+    // R6: passou do prazo de retirada?
     public boolean prazoVencido(LocalDate data) {
         return situacao == SituacaoReserva.AGUARDANDO && data.isAfter(dataLimiteRetirada);
     }
 
-    /** R6: expira e libera a cópia. */
+    // R6: expira e libera a cópia.
     public void expirar() {
         if (copiaSeparada != null) {
             copiaSeparada.liberar();
@@ -57,7 +52,7 @@ public class Reserva {
         situacao = SituacaoReserva.EXPIRADA;
     }
 
-    /** R7. */
+    // R7.
     public void cancelar() throws Exception {
         if (!situacao.isViva()) {
             throw new Exception("A reserva " + codigo + " não está ativa (situação: " + situacao + ").");
@@ -68,13 +63,11 @@ public class Reserva {
         situacao = SituacaoReserva.CANCELADA;
     }
 
-    /** R5: o leitor retirou a cópia separada. */
+    // R5: o leitor retirou a cópia separada.
     public void atender(Emprestimo emprestimo) {
         situacao = SituacaoReserva.ATENDIDA;
         codigoEmprestimo = emprestimo.getCodigo();
     }
-
-    // ---------- getters / setters ----------
 
     public int getCodigo() {
         return codigo;

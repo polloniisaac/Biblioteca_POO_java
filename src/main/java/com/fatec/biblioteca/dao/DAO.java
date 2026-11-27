@@ -21,16 +21,7 @@ import com.fatec.biblioteca.Funcionario;
 import com.fatec.biblioteca.Leitor;
 import com.fatec.biblioteca.Obra;
 
-/**
- * Classe-mãe de todos os DAOs (herança). Guarda a URL do banco e abre as
- * conexões, como o ClienteDAO do poo12. Diferença proposital: os métodos
- * NÃO capturam exceções; elas sobem até a tela (Frm), que mostra a mensagem.
- *
- * A conexão é lida do arquivo db.properties. Ele é procurado, nesta ordem:
- * 1) na pasta onde o programa roda; 2) em Biblioteca_System/ abaixo dela;
- * 3) subindo a partir da pasta das classes compiladas (acha a pasta do pom.xml);
- * 4) no classpath (src/main/resources). Se não achar, usa root sem senha.
- */
+// Classe-mãe dos DAOs (herança). As exceções sobem até a tela.
 public abstract class DAO {
 
     protected static final String URL;
@@ -72,25 +63,21 @@ public abstract class DAO {
         SENHA = p.getProperty("senha", "").trim();
     }
 
-    /** Lugares onde o db.properties pode estar, do mais provável ao menos. */
     private static List<Path> candidatos() {
         List<Path> lista = new ArrayList<>();
         lista.add(Path.of("db.properties"));
         lista.add(Path.of("Biblioteca_System", "db.properties"));
         try {
             Path pasta = Path.of(DAO.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            // ex.: .../Biblioteca_System/target/classes -> sobe até achar o db.properties
             for (int i = 0; i < 5 && pasta != null; i++) {
                 lista.add(pasta.resolve("db.properties"));
                 pasta = pasta.getParent();
             }
         } catch (Exception e) {
-            // sem localização das classes: fica só com as outras opções
         }
         return lista;
     }
 
-    /** De onde veio a configuração (para mostrar na mensagem de erro). */
     public static String getOrigemConfiguracao() {
         return origemConfiguracao;
     }
@@ -99,7 +86,6 @@ public abstract class DAO {
         return DriverManager.getConnection(URL, USUARIO, SENHA);
     }
 
-    /** Cada DAO cria a sua tabela (CREATE TABLE IF NOT EXISTS), como no poo12. */
     public abstract void criarNovaTabela() throws SQLException;
 
     protected void executar(String sql) throws SQLException {
@@ -107,8 +93,6 @@ public abstract class DAO {
             stmt.execute(sql);
         }
     }
-
-    // ---------- conversões usadas pelos DAOs ----------
 
     protected static Date paraSql(LocalDate data) {
         return data == null ? null : Date.valueOf(data);
@@ -118,7 +102,6 @@ public abstract class DAO {
         return data == null ? null : data.toLocalDate();
     }
 
-    /** Monta a subclasse certa de Leitor a partir de uma linha do banco. */
     protected static Leitor montarLeitor(int codigo, String nome, int tipo) throws SQLException {
         try {
             Leitor l = Leitor.criar(tipo);

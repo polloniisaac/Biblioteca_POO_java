@@ -2,7 +2,6 @@ package com.fatec.biblioteca.ui;
 
 import javax.swing.table.DefaultTableModel;
 
-/** DefaultTableModel que não deixa editar as células (só consulta). */
 public class Tabela extends DefaultTableModel {
 
     public Tabela(String... colunas) {

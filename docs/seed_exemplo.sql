@@ -1,15 +1,5 @@
--- =====================================================================
--- Dados de exemplo para a apresentação (mínimo exigido pelo PDF, Seção 7.4):
--- 15 títulos das 5 categorias, 8 leitores dos 3 tipos e 12 empréstimos:
--- devoluções no prazo (1–3), devoluções com multa (4–6), em aberto no prazo
--- (7–9) e em aberto atrasados (10–12), mais uma reserva na fila.
--- As datas são relativas ao dia em que o script roda (CURDATE()), então os
--- atrasos sempre aparecem corretos.
---
--- Como usar: abra o sistema uma vez (ele cria as tabelas e o usuário admin)
--- ou rode schema_biblioteca.sql; depois rode este script num banco VAZIO.
--- Também cria o usuário "voluntario" (senha "1234", cargo Voluntário).
--- =====================================================================
+-- Dados de exemplo para a apresentação (rodar num banco vazio, depois de abrir o sistema uma vez).
+-- Cria também o usuário "voluntario" (senha "1234").
 SET NAMES utf8mb4;
 USE biblioteca_vila_leitura;
 

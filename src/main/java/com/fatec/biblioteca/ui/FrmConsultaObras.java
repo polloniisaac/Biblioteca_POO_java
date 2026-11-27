@@ -16,7 +16,7 @@ import com.fatec.biblioteca.Categoria;
 import com.fatec.biblioteca.Obra;
 import com.fatec.biblioteca.dao.ObraDAO;
 
-/** RF03 (listar acervo) e RF05 (pesquisar por categoria). */
+// RF03 (listar acervo) e RF05 (pesquisar por categoria).
 public class FrmConsultaObras extends JFrame {
 
     private JTable tabela;
@@ -39,6 +39,8 @@ public class FrmConsultaObras extends JFrame {
         criarComponentes();
 
         carregarDados();
+
+        Estilo.padronizar(this);
     }
 
     private void criarComponentes() {

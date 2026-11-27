@@ -14,10 +14,7 @@ import com.fatec.biblioteca.Categoria;
 import com.fatec.biblioteca.PerfilUso;
 import com.fatec.biblioteca.dao.EmprestimoDAO;
 
-/**
- * RF13: matriz tipo de leitor x categoria. Empate: vale a primeira categoria
- * encontrada na varredura (critério permitido pelo PDF).
- */
+// RF13: matriz tipo de leitor x categoria
 public class FrmRelPerfilUso extends JFrame {
 
     private Tabela modelo;
@@ -58,6 +55,8 @@ public class FrmRelPerfilUso extends JFrame {
         btnAtualizar.addActionListener(e -> carregarDados());
 
         carregarDados();
+
+        Estilo.padronizar(this);
     }
 
     private void carregarDados() {

@@ -26,7 +26,7 @@ import com.fatec.biblioteca.Validador;
 import com.fatec.biblioteca.dao.EmprestimoDAO;
 import com.fatec.biblioteca.dao.ObraDAO;
 
-/** RF01 (cadastrar), RF04 (consultar ficha), alterar e excluir obras. */
+// RF01 (cadastrar), RF04 (consultar ficha), alterar e excluir obras.
 public class FrmObra extends JFrame {
 
     private JTextField txtCodigo;
@@ -112,6 +112,8 @@ public class FrmObra extends JFrame {
         add(sul, BorderLayout.CENTER);
 
         configurarEventos();
+
+        Estilo.padronizar(this);
     }
 
     private void configurarEventos() {
@@ -123,7 +125,7 @@ public class FrmObra extends JFrame {
         btnListar.addActionListener(e -> new FrmConsultaObras().setVisible(true));
     }
 
-    /** Preenche a obra com o que foi digitado; os setters validam RN01–RN03. */
+    // Preenche a obra com o que foi digitado; os setters validam RN01–RN03.
     private Obra lerCampos() throws Exception {
         Obra obra = new Obra();
         obra.setCodigo(Validador.inteiro(txtCodigo.getText(), "Código"));
@@ -174,7 +176,7 @@ public class FrmObra extends JFrame {
         }
     }
 
-    /** RF04: ficha com exemplares, empréstimos em aberto e fila de reservas. */
+    // RF04: ficha com exemplares, empréstimos em aberto e fila de reservas.
     private void mostrarFicha(Obra obra) throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%d - %s (%s, %s, %d)%n", obra.getCodigo(), obra.getTitulo(), obra.getAutor(),
