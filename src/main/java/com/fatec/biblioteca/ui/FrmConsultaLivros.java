@@ -13,11 +13,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import com.fatec.biblioteca.Categoria;
-import com.fatec.biblioteca.Obra;
-import com.fatec.biblioteca.dao.ObraDAO;
+import com.fatec.biblioteca.Livro;
+import com.fatec.biblioteca.dao.LivroDAO;
 
 // RF03 (listar acervo) e RF05 (pesquisar por categoria).
-public class FrmConsultaObras extends JFrame {
+public class FrmConsultaLivros extends JFrame {
 
     private JTable tabela;
     private Tabela modelo;
@@ -25,11 +25,11 @@ public class FrmConsultaObras extends JFrame {
     private JLabel lblTotais;
     private JButton btnAtualizar;
 
-    private ObraDAO dao;
+    private LivroDAO dao;
 
-    public FrmConsultaObras() {
+    public FrmConsultaLivros() {
 
-        dao = new ObraDAO();
+        dao = new LivroDAO();
 
         setTitle("Acervo");
         setSize(950, 450);
@@ -79,9 +79,9 @@ public class FrmConsultaObras extends JFrame {
             modelo.setRowCount(0);
             Categoria filtro = cbCategoria.getSelectedItem() instanceof Categoria
                     ? (Categoria) cbCategoria.getSelectedItem() : null;
-            List<Obra> lista = dao.listar(filtro);
+            List<Livro> lista = dao.listar(filtro);
             int exemplares = 0;
-            for (Obra o : lista) {
+            for (Livro o : lista) {
                 modelo.addRow(new Object[] {
                     o.getCodigo(),
                     o.getTitulo(),

@@ -19,7 +19,7 @@ import java.util.Properties;
 import com.fatec.biblioteca.Categoria;
 import com.fatec.biblioteca.Funcionario;
 import com.fatec.biblioteca.Leitor;
-import com.fatec.biblioteca.Obra;
+import com.fatec.biblioteca.Livro;
 
 // Classe-mãe dos DAOs (herança). As exceções sobem até a tela.
 public abstract class DAO {
@@ -124,10 +124,10 @@ public abstract class DAO {
         }
     }
 
-    protected static Obra montarObra(int codigo, String titulo, String autor, int categoria, int ano)
+    protected static Livro montarLivro(int codigo, String titulo, String autor, int categoria, int ano)
             throws SQLException {
         try {
-            Obra o = new Obra();
+            Livro o = new Livro();
             o.setCodigo(codigo);
             o.setTitulo(titulo);
             o.setAutor(autor);
@@ -135,7 +135,7 @@ public abstract class DAO {
             o.setAnoPublicacao(ano);
             return o;
         } catch (Exception e) {
-            throw new SQLException("Obra " + codigo + " inválida no banco: " + e.getMessage());
+            throw new SQLException("Livro " + codigo + " inválido no banco: " + e.getMessage());
         }
     }
 }

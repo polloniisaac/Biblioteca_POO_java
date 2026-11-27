@@ -83,7 +83,7 @@ public class FrmRelAtrasos extends JFrame {
             double arrecadado = 0;
             for (Emprestimo e : dao.listarDevolvidosComMulta()) {
                 modeloCobradas.addRow(new Object[] {
-                    e.getCodigo(), e.getLeitor().getNome(), e.getObra().getTitulo(),
+                    e.getCodigo(), e.getLeitor().getNome(), e.getLivro().getTitulo(),
                     Datas.formatar(e.getDataDevolucao()), e.calcularDiasAtraso(), Mensagem.numero(e.getMulta())
                 });
                 arrecadado += e.getMulta();
@@ -95,7 +95,7 @@ public class FrmRelAtrasos extends JFrame {
             for (Emprestimo e : dao.listarAtrasados(ref)) {
                 double multa = e.calcularMulta(ref);
                 modeloPrevistas.addRow(new Object[] {
-                    e.getCodigo(), e.getLeitor().getNome(), e.getObra().getTitulo(),
+                    e.getCodigo(), e.getLeitor().getNome(), e.getLivro().getTitulo(),
                     Datas.formatar(e.getDataPrevista()), e.calcularDiasAtraso(ref), Mensagem.numero(multa)
                 });
                 previsto += multa;

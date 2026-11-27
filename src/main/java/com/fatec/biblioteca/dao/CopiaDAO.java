@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fatec.biblioteca.Copia;
-import com.fatec.biblioteca.Obra;
+import com.fatec.biblioteca.Livro;
 import com.fatec.biblioteca.SituacaoCopia;
 
 public class CopiaDAO extends DAO {
@@ -19,21 +19,21 @@ public class CopiaDAO extends DAO {
     public void criarNovaTabela() throws SQLException {
         executar("CREATE TABLE IF NOT EXISTS copia ("
                 + " codigo INT NOT NULL AUTO_INCREMENT,"
-                + " obra_codigo INT NOT NULL,"
+                + " livro_codigo INT NOT NULL,"
                 + " numero INT NOT NULL,"
                 + " situacao VARCHAR(20) NOT NULL DEFAULT 'DISPONIVEL',"
                 + " CONSTRAINT pk_copia PRIMARY KEY (codigo),"
-                + " CONSTRAINT fk_copia_obra FOREIGN KEY (obra_codigo) REFERENCES obra (codigo),"
-                + " CONSTRAINT uk_copia_obra_numero UNIQUE (obra_codigo, numero),"
+                + " CONSTRAINT fk_copia_livro FOREIGN KEY (livro_codigo) REFERENCES livro (codigo),"
+                + " CONSTRAINT uk_copia_livro_numero UNIQUE (livro_codigo, numero),"
                 + " CONSTRAINT ck_copia_numero CHECK (numero >= 1),"
                 + " CONSTRAINT ck_copia_situacao CHECK (situacao IN ('DISPONIVEL','EMPRESTADA','RESERVADA'))"
                 + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
     }
 
     public void inserir(Connection conn, Copia c) throws SQLException {
-        String sql = "INSERT INTO copia(obra_codigo, numero, situacao) VALUES(?, ?, ?)";
+        String sql = "INSERT INTO copia(livro_codigo, numero, situacao) VALUES(?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, c.getObra().getCodigo());
+            pstmt.setInt(1, c.getLivro().getCodigo());
             pstmt.setInt(2, c.getNumero());
             pstmt.setString(3, c.getSituacao().name());
             pstmt.executeUpdate();
@@ -45,14 +45,14 @@ public class CopiaDAO extends DAO {
     }
 
     // RF02: grava as cópias e já separa para a fila de reservas
-    public int adicionarCopias(Obra obra, List<Copia> novas) throws SQLException {
+    public int adicionarCopias(Livro livro, List<Copia> novas) throws SQLException {
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
             try {
                 for (Copia c : novas) {
                     inserir(conn, c);
                 }
-                int separadas = new ReservaDAO().atualizarFila(conn, obra.getCodigo(), LocalDate.now()).size();
+                int separadas = new ReservaDAO().atualizarFila(conn, livro.getCodigo(), LocalDate.now()).size();
                 conn.commit();
                 return separadas;
             } catch (SQLException e) {
@@ -70,18 +70,18 @@ public class CopiaDAO extends DAO {
         }
     }
 
-    // Preenche a lista de cópias da obra (composição).
-    public void carregarCopias(Connection conn, Obra obra) throws SQLException {
-        String sql = "SELECT * FROM copia WHERE obra_codigo=? ORDER BY numero";
+    // Preenche a lista de cópias do livro (composição).
+    public void carregarCopias(Connection conn, Livro livro) throws SQLException {
+        String sql = "SELECT * FROM copia WHERE livro_codigo=? ORDER BY numero";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, obra.getCodigo());
+            pstmt.setInt(1, livro.getCodigo());
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 Copia c = new Copia();
                 c.setCodigo(rs.getInt("codigo"));
                 c.setNumero(rs.getInt("numero"));
                 c.setSituacao(SituacaoCopia.valueOf(rs.getString("situacao")));
-                obra.adicionarCopiaCarregada(c);
+                livro.adicionarCopiaCarregada(c);
             }
         }
     }
@@ -89,7 +89,7 @@ public class CopiaDAO extends DAO {
     // RF15 / RN18: confere a situação de cada cópia
     public List<String> verificarConsistencia() throws SQLException {
         List<String> avisos = new ArrayList<>();
-        String sql = "SELECT c.codigo, c.obra_codigo, c.numero, c.situacao,"
+        String sql = "SELECT c.codigo, c.livro_codigo, c.numero, c.situacao,"
                 + " CASE WHEN EXISTS (SELECT 1 FROM emprestimo e WHERE e.copia_codigo = c.codigo"
                 + "                   AND e.data_devolucao IS NULL) THEN 'EMPRESTADA'"
                 + "      WHEN EXISTS (SELECT 1 FROM reserva r WHERE r.copia_codigo = c.codigo"
@@ -103,7 +103,7 @@ public class CopiaDAO extends DAO {
                 String gravado = rs.getString("situacao");
                 String esperado = rs.getString("esperado");
                 if (!gravado.equals(esperado)) {
-                    avisos.add("AVISO: livro " + rs.getInt("obra_codigo") + " - cópia " + rs.getInt("obra_codigo")
+                    avisos.add("AVISO: livro " + rs.getInt("livro_codigo") + " - cópia " + rs.getInt("livro_codigo")
                             + "-" + rs.getInt("numero") + " estava " + gravado
                             + "; pelos empréstimos/reservas deveria estar " + esperado + ". Situação corrigida.");
                     Copia c = new Copia();

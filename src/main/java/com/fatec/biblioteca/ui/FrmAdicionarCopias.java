@@ -12,26 +12,26 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.fatec.biblioteca.Copia;
-import com.fatec.biblioteca.Obra;
+import com.fatec.biblioteca.Livro;
 import com.fatec.biblioteca.Validador;
 import com.fatec.biblioteca.dao.CopiaDAO;
-import com.fatec.biblioteca.dao.ObraDAO;
+import com.fatec.biblioteca.dao.LivroDAO;
 
-// RF02: adicionar exemplares (cópias) a uma obra já cadastrada.
+// RF02: adicionar exemplares (cópias) a um livro já cadastrado.
 public class FrmAdicionarCopias extends JFrame {
 
     private JTextField txtCodigo;
-    private JLabel lblObra;
+    private JLabel lblLivro;
     private JTextField txtQuantidade;
     private JButton btnBuscar;
     private JButton btnAdicionar;
 
-    private ObraDAO obraDAO;
+    private LivroDAO livroDAO;
     private CopiaDAO copiaDAO;
 
     public FrmAdicionarCopias() {
 
-        obraDAO = new ObraDAO();
+        livroDAO = new LivroDAO();
         copiaDAO = new CopiaDAO();
 
         setTitle("Adicionar Exemplares");
@@ -45,8 +45,8 @@ public class FrmAdicionarCopias extends JFrame {
         txtCodigo = new JTextField();
         painel.add(txtCodigo);
         painel.add(new JLabel("Livro"));
-        lblObra = new JLabel("-");
-        painel.add(lblObra);
+        lblLivro = new JLabel("-");
+        painel.add(lblLivro);
         painel.add(new JLabel("Novos exemplares (1 a 50)"));
         txtQuantidade = new JTextField();
         painel.add(txtQuantidade);
@@ -66,15 +66,15 @@ public class FrmAdicionarCopias extends JFrame {
         Estilo.padronizar(this);
     }
 
-    private Obra buscar() {
+    private Livro buscar() {
         try {
-            Obra obra = obraDAO.carregar(Validador.inteiro(txtCodigo.getText(), "Código"));
-            if (obra == null) {
-                lblObra.setText("-");
+            Livro livro = livroDAO.carregar(Validador.inteiro(txtCodigo.getText(), "Código"));
+            if (livro == null) {
+                lblLivro.setText("-");
                 throw new Exception("Livro não encontrado.");
             }
-            lblObra.setText(descricao(obra));
-            return obra;
+            lblLivro.setText(descricao(livro));
+            return livro;
         } catch (Exception err) {
             Mensagem.erro(this, err);
             return null;
@@ -83,14 +83,14 @@ public class FrmAdicionarCopias extends JFrame {
 
     private void adicionar() {
         try {
-            Obra obra = buscar();
-            if (obra == null) {
+            Livro livro = buscar();
+            if (livro == null) {
                 return;
             }
-            List<Copia> novas = obra.adicionarCopias(Validador.inteiro(txtQuantidade.getText(), "Quantidade"));
-            int separadas = copiaDAO.adicionarCopias(obra, novas);
-            Obra atual = obraDAO.carregar(obra.getCodigo());
-            lblObra.setText(descricao(atual));
+            List<Copia> novas = livro.adicionarCopias(Validador.inteiro(txtQuantidade.getText(), "Quantidade"));
+            int separadas = copiaDAO.adicionarCopias(livro, novas);
+            Livro atual = livroDAO.carregar(livro.getCodigo());
+            lblLivro.setText(descricao(atual));
             String msg = novas.size() + " exemplar(es) adicionado(s).\nNovas quantidades: total "
                     + atual.getTotalCopias() + ", disponíveis " + atual.getQtdDisponiveis() + ".";
             if (separadas > 0) {
@@ -103,7 +103,7 @@ public class FrmAdicionarCopias extends JFrame {
         }
     }
 
-    private String descricao(Obra o) {
+    private String descricao(Livro o) {
         return o.getTitulo() + " - total " + o.getTotalCopias() + ", disponíveis " + o.getQtdDisponiveis();
     }
 }

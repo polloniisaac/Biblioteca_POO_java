@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fatec.biblioteca.Copia;
-import com.fatec.biblioteca.Obra;
+import com.fatec.biblioteca.Livro;
 import com.fatec.biblioteca.Reserva;
 import com.fatec.biblioteca.SituacaoCopia;
 import com.fatec.biblioteca.SituacaoReserva;
@@ -24,13 +24,13 @@ public class ReservaDAO extends DAO {
             + " LEFT JOIN copia cp ON cp.codigo = r.copia_codigo"
             + " JOIN leitor l ON l.codigo = r.leitor_codigo"
             + " JOIN funcionario f ON f.codigo = r.funcionario_codigo"
-            + " JOIN obra o ON o.codigo = r.obra_codigo";
+            + " JOIN livro o ON o.codigo = r.livro_codigo";
 
     @Override
     public void criarNovaTabela() throws SQLException {
         executar("CREATE TABLE IF NOT EXISTS reserva ("
                 + " codigo INT NOT NULL AUTO_INCREMENT,"
-                + " obra_codigo INT NOT NULL,"
+                + " livro_codigo INT NOT NULL,"
                 + " leitor_codigo INT NOT NULL,"
                 + " funcionario_codigo INT NOT NULL,"
                 + " data_reserva DATE NOT NULL,"
@@ -39,26 +39,26 @@ public class ReservaDAO extends DAO {
                 + " emprestimo_codigo INT NULL,"
                 + " situacao VARCHAR(20) NOT NULL DEFAULT 'ATIVA',"
                 + " viva_leitor INT AS (IF(situacao IN ('ATIVA','AGUARDANDO'), leitor_codigo, NULL)) STORED,"
-                + " viva_obra INT AS (IF(situacao IN ('ATIVA','AGUARDANDO'), obra_codigo, NULL)) STORED,"
+                + " viva_livro INT AS (IF(situacao IN ('ATIVA','AGUARDANDO'), livro_codigo, NULL)) STORED,"
                 + " CONSTRAINT pk_reserva PRIMARY KEY (codigo),"
-                + " CONSTRAINT fk_res_obra FOREIGN KEY (obra_codigo) REFERENCES obra (codigo),"
+                + " CONSTRAINT fk_res_livro FOREIGN KEY (livro_codigo) REFERENCES livro (codigo),"
                 + " CONSTRAINT fk_res_leitor FOREIGN KEY (leitor_codigo) REFERENCES leitor (codigo),"
                 + " CONSTRAINT fk_res_func FOREIGN KEY (funcionario_codigo) REFERENCES funcionario (codigo),"
                 + " CONSTRAINT fk_res_copia FOREIGN KEY (copia_codigo) REFERENCES copia (codigo),"
                 + " CONSTRAINT fk_res_emp FOREIGN KEY (emprestimo_codigo) REFERENCES emprestimo (codigo),"
                 + " CONSTRAINT ck_res_situacao CHECK (situacao IN"
                 + "   ('ATIVA','AGUARDANDO','ATENDIDA','CANCELADA','EXPIRADA')),"
-                + " CONSTRAINT uk_res_viva UNIQUE (viva_leitor, viva_obra),"
-                + " INDEX idx_res_fila (obra_codigo, situacao, codigo)"
+                + " CONSTRAINT uk_res_viva UNIQUE (viva_leitor, viva_livro),"
+                + " INDEX idx_res_fila (livro_codigo, situacao, codigo)"
                 + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
     }
 
     public int inserir(Reserva obj) throws SQLException {
-        String sql = "INSERT INTO reserva(obra_codigo, leitor_codigo, funcionario_codigo, data_reserva, situacao)"
+        String sql = "INSERT INTO reserva(livro_codigo, leitor_codigo, funcionario_codigo, data_reserva, situacao)"
                 + " VALUES(?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, obj.getObra().getCodigo());
+            pstmt.setInt(1, obj.getLivro().getCodigo());
             pstmt.setInt(2, obj.getLeitor().getCodigo());
             pstmt.setInt(3, obj.getFuncionario().getCodigo());
             pstmt.setDate(4, paraSql(obj.getDataReserva()));
@@ -68,7 +68,7 @@ public class ReservaDAO extends DAO {
             if (rs.next()) {
                 obj.setCodigo(rs.getInt(1));
             }
-            obj.getObra().getFilaReservas().add(obj);
+            obj.getLivro().getFilaReservas().add(obj);
             return retorno;
         }
     }
@@ -95,7 +95,7 @@ public class ReservaDAO extends DAO {
                 if (r.getCopiaSeparada() != null) {
                     new CopiaDAO().atualizarSituacao(conn, r.getCopiaSeparada());
                 }
-                List<Reserva> separadas = atualizarFila(conn, r.getObra().getCodigo(), data);
+                List<Reserva> separadas = atualizarFila(conn, r.getLivro().getCodigo(), data);
                 conn.commit();
                 return separadas;
             } catch (SQLException e) {
@@ -106,26 +106,26 @@ public class ReservaDAO extends DAO {
     }
 
     // R4 e R6: expira reservas vencidas e separa cópias para a fila
-    public List<Reserva> atualizarFila(Connection conn, int codigoObra, LocalDate data) throws SQLException {
+    public List<Reserva> atualizarFila(Connection conn, int codigoLivro, LocalDate data) throws SQLException {
         List<Reserva> separadas = new ArrayList<>();
-        Obra obra = new ObraDAO().carregar(conn, codigoObra);
-        if (obra == null) {
+        Livro livro = new LivroDAO().carregar(conn, codigoLivro);
+        if (livro == null) {
             return separadas;
         }
         CopiaDAO copiaDAO = new CopiaDAO();
-        for (Reserva r : obra.getFilaReservas()) {
+        for (Reserva r : livro.getFilaReservas()) {
             if (r.prazoVencido(data)) {
                 r.expirar();
                 atualizar(conn, r);
                 copiaDAO.atualizarSituacao(conn, r.getCopiaSeparada());
             }
         }
-        for (Reserva r : obra.getFilaReservas()) {
+        for (Reserva r : livro.getFilaReservas()) {
             if (r.getSituacao() != SituacaoReserva.ATIVA) {
                 continue;
             }
             Copia livre = null;
-            for (Copia c : obra.getCopias()) {
+            for (Copia c : livro.getCopias()) {
                 if (c.getSituacao() == SituacaoCopia.DISPONIVEL) {
                     livre = c;
                     break;
@@ -151,16 +151,16 @@ public class ReservaDAO extends DAO {
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
             try {
-                List<Integer> obras = new ArrayList<>();
-                try (PreparedStatement pstmt = conn.prepareStatement("SELECT DISTINCT obra_codigo FROM reserva"
+                List<Integer> livros = new ArrayList<>();
+                try (PreparedStatement pstmt = conn.prepareStatement("SELECT DISTINCT livro_codigo FROM reserva"
                         + " WHERE situacao = 'AGUARDANDO' AND data_limite_retirada < ?")) {
                     pstmt.setDate(1, paraSql(data));
                     ResultSet rs = pstmt.executeQuery();
                     while (rs.next()) {
-                        obras.add(rs.getInt(1));
+                        livros.add(rs.getInt(1));
                     }
                 }
-                for (int cod : obras) {
+                for (int cod : livros) {
                     atualizarFila(conn, cod, data);
                 }
                 conn.commit();
@@ -171,31 +171,31 @@ public class ReservaDAO extends DAO {
         }
     }
 
-    // Preenche a fila de reservas vivas da obra (agregação), em ordem de chegada.
-    public void carregarFila(Connection conn, Obra obra) throws SQLException {
-        String sql = SELECT + " WHERE r.obra_codigo = ? AND r.situacao IN ('ATIVA','AGUARDANDO') ORDER BY r.codigo";
+    // Preenche a fila de reservas vivas do livro (agregação), em ordem de chegada.
+    public void carregarFila(Connection conn, Livro livro) throws SQLException {
+        String sql = SELECT + " WHERE r.livro_codigo = ? AND r.situacao IN ('ATIVA','AGUARDANDO') ORDER BY r.codigo";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, obra.getCodigo());
+            pstmt.setInt(1, livro.getCodigo());
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                obra.getFilaReservas().add(montar(rs, obra));
+                livro.getFilaReservas().add(montar(rs, livro));
             }
         }
     }
 
     public Reserva carregarViva(int codigo) throws SQLException {
-        int codigoObra;
+        int codigoLivro;
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("SELECT obra_codigo FROM reserva WHERE codigo=?")) {
+             PreparedStatement pstmt = conn.prepareStatement("SELECT livro_codigo FROM reserva WHERE codigo=?")) {
             pstmt.setInt(1, codigo);
             ResultSet rs = pstmt.executeQuery();
             if (!rs.next()) {
                 return null;
             }
-            codigoObra = rs.getInt(1);
+            codigoLivro = rs.getInt(1);
         }
-        Obra obra = new ObraDAO().carregar(codigoObra);
-        for (Reserva r : obra.getFilaReservas()) {
+        Livro livro = new LivroDAO().carregar(codigoLivro);
+        for (Reserva r : livro.getFilaReservas()) {
             if (r.getCodigo() == codigo) {
                 return r;
             }
@@ -206,34 +206,34 @@ public class ReservaDAO extends DAO {
     public List<Reserva> listar(boolean somenteVivas) throws SQLException {
         List<Reserva> lista = new ArrayList<>();
         String sql = SELECT + (somenteVivas ? " WHERE r.situacao IN ('ATIVA','AGUARDANDO')" : "")
-                + " ORDER BY r.obra_codigo, r.codigo";
+                + " ORDER BY r.livro_codigo, r.codigo";
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                Obra obra = montarObra(rs.getInt("obra_codigo"), rs.getString("titulo"), rs.getString("autor"),
+                Livro livro = montarLivro(rs.getInt("livro_codigo"), rs.getString("titulo"), rs.getString("autor"),
                         rs.getInt("categoria"), rs.getInt("ano_publicacao"));
-                lista.add(montar(rs, obra));
+                lista.add(montar(rs, livro));
             }
         }
         return lista;
     }
 
-    private Reserva montar(ResultSet rs, Obra obra) throws SQLException {
+    private Reserva montar(ResultSet rs, Livro livro) throws SQLException {
         Reserva r = new Reserva();
         r.setCodigo(rs.getInt("codigo"));
-        r.setObra(obra);
+        r.setLivro(livro);
         r.setLeitor(montarLeitor(rs.getInt("leitor_codigo"), rs.getString("leitor_nome"), rs.getInt("leitor_tipo")));
         r.setFuncionario(montarFuncionario(rs.getInt("funcionario_codigo"), rs.getString("f_nome"),
                 rs.getInt("f_cargo")));
         r.setDataReserva(paraLocalDate(rs.getDate("data_reserva")));
         int copia = rs.getInt("copia_codigo");
         if (!rs.wasNull()) {
-            Copia c = obra.getCopia(copia);
+            Copia c = livro.getCopia(copia);
             if (c == null) {
                 c = new Copia();
                 c.setCodigo(copia);
                 c.setNumero(rs.getInt("copia_numero"));
-                c.setObra(obra);
+                c.setLivro(livro);
             }
             r.setCopiaSeparada(c);
         }

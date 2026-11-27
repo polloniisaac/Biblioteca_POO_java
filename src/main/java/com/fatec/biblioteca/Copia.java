@@ -1,18 +1,18 @@
 package com.fatec.biblioteca;
 
-// Parte da Obra (composição); a situação só muda pelos métodos (RN15).
+// Parte do Livro (composição); a situação só muda pelos métodos (RN15).
 public class Copia {
 
     private int codigo;
-    private Obra obra;
+    private Livro livro;
     private int numero;
     private SituacaoCopia situacao = SituacaoCopia.DISPONIVEL;
 
     public Copia() {
     }
 
-    Copia(Obra obra, int numero) {
-        this.obra = obra;
+    Copia(Livro livro, int numero) {
+        this.livro = livro;
         this.numero = numero;
     }
 
@@ -44,7 +44,7 @@ public class Copia {
     }
 
     public String getEtiqueta() {
-        return (obra == null ? "?" : String.valueOf(obra.getCodigo())) + "-" + numero;
+        return (livro == null ? "?" : String.valueOf(livro.getCodigo())) + "-" + numero;
     }
 
     public int getCodigo() {
@@ -55,12 +55,12 @@ public class Copia {
         this.codigo = codigo;
     }
 
-    public Obra getObra() {
-        return obra;
+    public Livro getLivro() {
+        return livro;
     }
 
-    public void setObra(Obra obra) {
-        this.obra = obra;
+    public void setLivro(Livro livro) {
+        this.livro = livro;
     }
 
     public int getNumero() {

@@ -91,7 +91,7 @@ public class FrmEmprestimosAbertos extends JFrame {
                 }
                 modelo.addRow(new Object[] {
                     e.getCodigo(),
-                    e.getObra().getTitulo(),
+                    e.getLivro().getTitulo(),
                     e.getCopia().getEtiqueta(),
                     e.getLeitor().getNome(),
                     Datas.formatar(e.getDataEmprestimo()),

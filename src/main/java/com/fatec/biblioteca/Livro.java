@@ -3,7 +3,7 @@ package com.fatec.biblioteca;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Obra {
+public class Livro {
 
     private int codigo;
     private String titulo;
@@ -62,7 +62,7 @@ public class Obra {
     }
 
     public void adicionarCopiaCarregada(Copia copia) {
-        copia.setObra(this);
+        copia.setLivro(this);
         copias.add(copia);
     }
 

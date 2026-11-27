@@ -57,11 +57,11 @@ public class FrmConsultaReservas extends JFrame {
         try {
             modelo.setRowCount(0);
             List<Reserva> lista = dao.listar(chkVivas.isSelected());
-            int obraAnterior = -1;
+            int livroAnterior = -1;
             int posicao = 0;
             for (Reserva r : lista) {
-                if (r.getObra().getCodigo() != obraAnterior) {
-                    obraAnterior = r.getObra().getCodigo();
+                if (r.getLivro().getCodigo() != livroAnterior) {
+                    livroAnterior = r.getLivro().getCodigo();
                     posicao = 0;
                 }
                 String pos = "";
@@ -70,7 +70,7 @@ public class FrmConsultaReservas extends JFrame {
                 }
                 modelo.addRow(new Object[] {
                     r.getCodigo(),
-                    r.getObra().getCodigo() + " - " + r.getObra().getTitulo(),
+                    r.getLivro().getCodigo() + " - " + r.getLivro().getTitulo(),
                     r.getLeitor().getNome(),
                     Datas.formatar(r.getDataReserva()),
                     r.getSituacao(),

@@ -11,8 +11,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 
-import com.fatec.biblioteca.Obra;
-import com.fatec.biblioteca.dao.ObraDAO;
+import com.fatec.biblioteca.Livro;
+import com.fatec.biblioteca.dao.LivroDAO;
 
 // RF11: relatório de livros disponíveis e emprestados.
 public class FrmRelCirculacao extends JFrame {
@@ -22,11 +22,11 @@ public class FrmRelCirculacao extends JFrame {
     private JTextArea txtResumo;
     private JButton btnAtualizar;
 
-    private ObraDAO dao;
+    private LivroDAO dao;
 
     public FrmRelCirculacao() {
 
-        dao = new ObraDAO();
+        dao = new LivroDAO();
 
         setTitle("Relatório - Livros Disponíveis e Emprestados");
         setSize(850, 520);
@@ -58,13 +58,13 @@ public class FrmRelCirculacao extends JFrame {
     private void carregarDados() {
         try {
             modelo.setRowCount(0);
-            List<Obra> lista = dao.listar(null);
+            List<Livro> lista = dao.listar(null);
             int total = 0;
             int disponiveis = 0;
             int emprestados = 0;
             int reservados = 0;
             StringBuilder semExemplar = new StringBuilder();
-            for (Obra o : lista) {
+            for (Livro o : lista) {
                 modelo.addRow(new Object[] {
                     o.getCodigo(), o.getTitulo(), o.getTotalCopias(), o.getQtdDisponiveis(),
                     o.getQtdEmprestadas(), o.getQtdReservadas()

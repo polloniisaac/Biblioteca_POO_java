@@ -9,14 +9,17 @@ public class BancoDados {
 
     public List<String> inicializar() throws SQLException {
         List<String> mensagens = new ArrayList<>();
-        ObraDAO obraDAO = new ObraDAO();
+        LivroDAO livroDAO = new LivroDAO();
         CopiaDAO copiaDAO = new CopiaDAO();
         LeitorDAO leitorDAO = new LeitorDAO();
         FuncionarioDAO funcionarioDAO = new FuncionarioDAO();
         EmprestimoDAO emprestimoDAO = new EmprestimoDAO();
         ReservaDAO reservaDAO = new ReservaDAO();
 
-        obraDAO.criarNovaTabela();
+        if (livroDAO.migrarTabelaObra()) {
+            mensagens.add("Banco atualizado: tabela \"obra\" renomeada para \"livro\" (dados mantidos).");
+        }
+        livroDAO.criarNovaTabela();
         copiaDAO.criarNovaTabela();
         leitorDAO.criarNovaTabela();
         funcionarioDAO.criarNovaTabela();
@@ -27,19 +30,19 @@ public class BancoDados {
             mensagens.add("Primeira execução: criado o usuário \"admin\" com senha \"admin\" (Bibliotecário)."
                     + " Troque a senha em Sistema > Alterar minha senha.");
         }
-        int obras = obraDAO.contar();
+        int livros = livroDAO.contar();
         int leitores = leitorDAO.contar();
         int emprestimos = emprestimoDAO.contar();
-        if (obras == 0) {
-            mensagens.add("Nenhuma obra cadastrada. Iniciando com acervo vazio.");
+        if (livros == 0) {
+            mensagens.add("Nenhum livro cadastrado. Iniciando com acervo vazio.");
         }
         if (leitores == 0) {
             mensagens.add("Nenhum leitor cadastrado. Iniciando com cadastro vazio.");
         }
         mensagens.addAll(copiaDAO.verificarConsistencia());
-        mensagens.add(String.format("Dados carregados: %d obra(s), %d cópia(s), %d leitor(es), %d empréstimo(s)."
+        mensagens.add(String.format("Dados carregados: %d livro(s), %d cópia(s), %d leitor(es), %d empréstimo(s)."
                 + " Próximo código de empréstimo: %d.",
-                obras, copiaDAO.contar(), leitores, emprestimos, emprestimoDAO.proximoCodigo()));
+                livros, copiaDAO.contar(), leitores, emprestimos, emprestimoDAO.proximoCodigo()));
         return mensagens;
     }
 }

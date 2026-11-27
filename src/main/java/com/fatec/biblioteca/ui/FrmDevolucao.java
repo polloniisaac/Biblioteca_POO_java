@@ -74,7 +74,7 @@ public class FrmDevolucao extends JFrame {
                 lblInfo.setText("-");
                 throw new Exception("Empréstimo não encontrado.");
             }
-            lblInfo.setText("Livro: " + emp.getObra().getTitulo() + " | Leitor: " + emp.getLeitor().getNome()
+            lblInfo.setText("Livro: " + emp.getLivro().getTitulo() + " | Leitor: " + emp.getLeitor().getNome()
                     + " | Previsto: " + Datas.formatar(emp.getDataPrevista()));
             return emp;
         } catch (Exception err) {

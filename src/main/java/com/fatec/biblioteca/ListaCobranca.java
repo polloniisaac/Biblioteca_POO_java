@@ -41,7 +41,7 @@ public class ListaCobranca {
                 "Emp.", "Livro", "Leitor", "Tipo", "Previsto", "Atraso", "Multa"));
         for (Emprestimo e : atrasados) {
             sb.append(String.format("%-5d %-28s %-20s %-11s %-10s %-8s %8.2f%n",
-                    e.getCodigo(), cortar(e.getObra().getTitulo(), 28), cortar(e.getLeitor().getNome(), 20),
+                    e.getCodigo(), cortar(e.getLivro().getTitulo(), 28), cortar(e.getLeitor().getNome(), 20),
                     e.getLeitor().getDescricaoTipo(), Datas.formatar(e.getDataPrevista()),
                     e.calcularDiasAtraso(dataReferencia) + " dias", e.calcularMulta(dataReferencia)));
         }

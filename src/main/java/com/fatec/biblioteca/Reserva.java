@@ -2,11 +2,11 @@ package com.fatec.biblioteca;
 
 import java.time.LocalDate;
 
-// Associação com Obra, Leitor e Funcionario.
+// Associação com Livro, Leitor e Funcionario.
 public class Reserva {
 
     private int codigo;
-    private Obra obra;
+    private Livro livro;
     private Leitor leitor;
     private Funcionario funcionario;
     private LocalDate dataReserva;
@@ -18,11 +18,11 @@ public class Reserva {
     public Reserva() {
     }
 
-    public Reserva(Obra obra, Leitor leitor, Funcionario funcionario, LocalDate data) throws Exception {
+    public Reserva(Livro livro, Leitor leitor, Funcionario funcionario, LocalDate data) throws Exception {
         if (data == null) {
             throw new Exception("Informe a data da reserva.");
         }
-        this.obra = obra;
+        this.livro = livro;
         this.leitor = leitor;
         this.funcionario = funcionario;
         this.dataReserva = data;
@@ -77,12 +77,12 @@ public class Reserva {
         this.codigo = codigo;
     }
 
-    public Obra getObra() {
-        return obra;
+    public Livro getLivro() {
+        return livro;
     }
 
-    public void setObra(Obra obra) {
-        this.obra = obra;
+    public void setLivro(Livro livro) {
+        this.livro = livro;
     }
 
     public Leitor getLeitor() {

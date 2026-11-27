@@ -62,16 +62,16 @@ public abstract class Leitor extends Pessoa {
         return null;
     }
 
-    public boolean possuiObraEmprestada(int codigoObra) {
+    public boolean possuiLivroEmprestado(int codigoLivro) {
         for (Emprestimo e : emprestimosAbertos) {
-            if (e.getCopia().getObra().getCodigo() == codigoObra) {
+            if (e.getCopia().getLivro().getCodigo() == codigoLivro) {
                 return true;
             }
         }
         return false;
     }
 
-    public void validarNovoEmprestimo(Obra obra, LocalDate data) throws Exception {
+    public void validarNovoEmprestimo(Livro livro, LocalDate data) throws Exception {
         if (atingiuLimite()) {
             throw new Exception("Limite de empréstimos simultâneos atingido para o tipo "
                     + getDescricaoTipo() + " (" + getSituacao() + " livros).");
@@ -82,25 +82,25 @@ public abstract class Leitor extends Pessoa {
                     + ", previsto para " + Datas.formatar(atrasado.getDataPrevista()) + ").\n"
                     + "Regularize a devolução antes de realizar novo empréstimo.");
         }
-        if (possuiObraEmprestada(obra.getCodigo())) {
-            throw new Exception("O leitor já possui um empréstimo em aberto desta obra.");
+        if (possuiLivroEmprestado(livro.getCodigo())) {
+            throw new Exception("O leitor já possui um empréstimo em aberto deste livro.");
         }
     }
 
-    public void validarNovaReserva(Obra obra, LocalDate data) throws Exception {
+    public void validarNovaReserva(Livro livro, LocalDate data) throws Exception {
         Emprestimo atrasado = getEmprestimoEmAtraso(data);
         if (atrasado != null) {
             throw new Exception("O leitor possui empréstimo em atraso (nº " + atrasado.getCodigo()
                     + ") e não pode fazer reservas.");
         }
-        if (possuiObraEmprestada(obra.getCodigo())) {
-            throw new Exception("O leitor já está com esta obra emprestada.");
+        if (possuiLivroEmprestado(livro.getCodigo())) {
+            throw new Exception("O leitor já está com este livro emprestado.");
         }
-        if (obra.getReservaViva(this) != null) {
-            throw new Exception("O leitor já possui uma reserva ativa desta obra.");
+        if (livro.getReservaViva(this) != null) {
+            throw new Exception("O leitor já possui uma reserva ativa deste livro.");
         }
-        if (obra.getQtdDisponiveis() > 0) {
-            throw new Exception("Há cópia disponível desta obra. Faça o empréstimo em vez da reserva.");
+        if (livro.getQtdDisponiveis() > 0) {
+            throw new Exception("Há cópia disponível deste livro. Faça o empréstimo em vez da reserva.");
         }
     }
 

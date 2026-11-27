@@ -45,13 +45,13 @@ public class FrmPrincipal extends JFrame {
         // polimorfismo: Bibliotecario devolve true, Voluntario devolve false
         btnFuncionarios.setEnabled(usuario.podeGerenciarCadastros());
         secao("Cadastros",
-                atalho("Obras (livros)", "Cadastrar, alterar e excluir livros", FrmObra::new),
+                atalho("Livros", "Cadastrar, alterar e excluir livros", FrmLivro::new),
                 atalho("Adicionar exemplares", "Novas cópias de um livro", FrmAdicionarCopias::new),
                 atalho("Leitores", "Estudantes, professores e comunidade", FrmLeitor::new),
                 btnFuncionarios);
 
         secao("Consultas e relatórios",
-                atalho("Acervo", "Livros por categoria", FrmConsultaObras::new),
+                atalho("Acervo", "Livros por categoria", FrmConsultaLivros::new),
                 atalho("Disponíveis e emprestados", "Situação da circulação", FrmRelCirculacao::new),
                 atalho("Atrasos e multas", "Multas cobradas e previstas", FrmRelAtrasos::new),
                 atalho("Perfil de uso", "Tipo de leitor x categoria", FrmRelPerfilUso::new));
@@ -66,7 +66,7 @@ public class FrmPrincipal extends JFrame {
 
         // Menu Cadastros (RF01, RF02, RF06 + funcionários)
         JMenu menuCadastros = new JMenu("Cadastros");
-        menuCadastros.add(item("Obras (livros)", FrmObra::new));
+        menuCadastros.add(item("Livros", FrmLivro::new));
         menuCadastros.add(item("Adicionar exemplares", FrmAdicionarCopias::new));
         menuCadastros.add(item("Leitores", FrmLeitor::new));
         JMenuItem miFuncionarios = item("Funcionários", FrmFuncionario::new);
@@ -81,7 +81,7 @@ public class FrmPrincipal extends JFrame {
 
         // Menu Consultas (RF03, RF05, RF07, RF10)
         JMenu menuConsultas = new JMenu("Consultas");
-        menuConsultas.add(item("Acervo", FrmConsultaObras::new));
+        menuConsultas.add(item("Acervo", FrmConsultaLivros::new));
         menuConsultas.add(item("Leitores", FrmConsultaLeitores::new));
         menuConsultas.add(item("Empréstimos em aberto", FrmEmprestimosAbertos::new));
         menuConsultas.add(item("Reservas", FrmConsultaReservas::new));

@@ -16,13 +16,13 @@ import com.fatec.biblioteca.Copia;
 import com.fatec.biblioteca.Datas;
 import com.fatec.biblioteca.Emprestimo;
 import com.fatec.biblioteca.Leitor;
-import com.fatec.biblioteca.Obra;
+import com.fatec.biblioteca.Livro;
 import com.fatec.biblioteca.Reserva;
 import com.fatec.biblioteca.Sessao;
 import com.fatec.biblioteca.Validador;
 import com.fatec.biblioteca.dao.EmprestimoDAO;
 import com.fatec.biblioteca.dao.LeitorDAO;
-import com.fatec.biblioteca.dao.ObraDAO;
+import com.fatec.biblioteca.dao.LivroDAO;
 import com.fatec.biblioteca.dao.ReservaDAO;
 
 // RF08: realizar empréstimo (RN06–RN10, RN13–RN16).
@@ -30,22 +30,22 @@ public class FrmEmprestimo extends JFrame {
 
     private JTextField txtLeitor;
     private JLabel lblLeitor;
-    private JTextField txtObra;
-    private JLabel lblObra;
+    private JTextField txtLivro;
+    private JLabel lblLivro;
     private JTextField txtData;
 
     private JButton btnRealizar;
     private JButton btnLimpar;
 
     private LeitorDAO leitorDAO;
-    private ObraDAO obraDAO;
+    private LivroDAO livroDAO;
     private EmprestimoDAO emprestimoDAO;
     private ReservaDAO reservaDAO;
 
     public FrmEmprestimo() {
 
         leitorDAO = new LeitorDAO();
-        obraDAO = new ObraDAO();
+        livroDAO = new LivroDAO();
         emprestimoDAO = new EmprestimoDAO();
         reservaDAO = new ReservaDAO();
 
@@ -65,11 +65,11 @@ public class FrmEmprestimo extends JFrame {
         painel.add(lblLeitor);
 
         painel.add(new JLabel("Código do livro"));
-        txtObra = new JTextField();
-        painel.add(txtObra);
+        txtLivro = new JTextField();
+        painel.add(txtLivro);
         painel.add(new JLabel("Livro"));
-        lblObra = new JLabel("-");
-        painel.add(lblObra);
+        lblLivro = new JLabel("-");
+        painel.add(lblLivro);
 
         painel.add(new JLabel("Data do empréstimo (dd/mm/aaaa)"));
         txtData = new JTextField(Datas.hoje());
@@ -91,11 +91,11 @@ public class FrmEmprestimo extends JFrame {
                 mostrarLeitor();
             }
         });
-        txtObra.addActionListener(e -> mostrarObra());
-        txtObra.addFocusListener(new java.awt.event.FocusAdapter() {
+        txtLivro.addActionListener(e -> mostrarLivro());
+        txtLivro.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
-                mostrarObra();
+                mostrarLivro();
             }
         });
         btnRealizar.addActionListener(e -> realizar());
@@ -117,17 +117,17 @@ public class FrmEmprestimo extends JFrame {
         }
     }
 
-    private void mostrarObra() {
+    private void mostrarLivro() {
         try {
-            if (txtObra.getText().isBlank()) {
+            if (txtLivro.getText().isBlank()) {
                 return;
             }
-            Obra o = obraDAO.carregar(Validador.inteiro(txtObra.getText(), "Código do livro"));
-            lblObra.setText(o == null ? "Livro não encontrado"
+            Livro o = livroDAO.carregar(Validador.inteiro(txtLivro.getText(), "Código do livro"));
+            lblLivro.setText(o == null ? "Livro não encontrado"
                     : o.getTitulo() + " - " + o.getQtdDisponiveis() + " disponível(is)"
                             + (o.getQtdReservadas() > 0 ? ", " + o.getQtdReservadas() + " reservado(s)" : ""));
         } catch (Exception err) {
-            lblObra.setText(err.getMessage());
+            lblLivro.setText(err.getMessage());
         }
     }
 
@@ -143,14 +143,14 @@ public class FrmEmprestimo extends JFrame {
             if (leitor == null) {
                 throw new Exception("Leitor não encontrado.");                          // RN07
             }
-            Obra obra = obraDAO.carregar(Validador.inteiro(txtObra.getText(), "Código do livro"));
-            if (obra == null) {
+            Livro livro = livroDAO.carregar(Validador.inteiro(txtLivro.getText(), "Código do livro"));
+            if (livro == null) {
                 throw new Exception("Livro não encontrado.");                           // RN06
             }
 
-            leitor.validarNovoEmprestimo(obra, data);                                  // RN07, RN08, RN09
-            Reserva reserva = obra.getReservaAguardando(leitor);                       // R5
-            Copia copia = obra.getCopiaParaEmprestimo(leitor);                         // RN06
+            leitor.validarNovoEmprestimo(livro, data);                                  // RN07, RN08, RN09
+            Reserva reserva = livro.getReservaAguardando(leitor);                       // R5
+            Copia copia = livro.getCopiaParaEmprestimo(leitor);                         // RN06
             Emprestimo emp = new Emprestimo(copia, leitor, Sessao.getFuncionario(), data); // RN10 (polimorfismo)
 
             emprestimoDAO.registrarEmprestimo(emp, reserva);                           // RN13 + RN16 (transação)
@@ -166,9 +166,9 @@ public class FrmEmprestimo extends JFrame {
 
     private void limparCampos() {
         txtLeitor.setText("");
-        txtObra.setText("");
+        txtLivro.setText("");
         lblLeitor.setText("-");
-        lblObra.setText("-");
+        lblLivro.setText("-");
         txtData.setText(Datas.hoje());
         txtLeitor.requestFocus();
     }

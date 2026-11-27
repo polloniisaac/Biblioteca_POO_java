@@ -77,8 +77,8 @@ public class Emprestimo {
         return atraso == 0 ? "NO PRAZO" : "ATRASADO há " + atraso + " dia(s)";
     }
 
-    public Obra getObra() {
-        return copia.getObra();
+    public Livro getLivro() {
+        return copia.getLivro();
     }
 
     public int getCodigo() {

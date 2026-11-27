@@ -34,12 +34,12 @@ src/main/java/com/fatec/biblioteca/
 ├── Main.java                 carrega o banco (RF15) e abre o login
 ├── Pessoa, Leitor, Estudante, Professor, Comunidade
 ├── Funcionario, Bibliotecario, Voluntario
-├── Obra, Copia, Emprestimo, Reserva, PerfilUso, ListaCobranca
+├── Livro, Copia, Emprestimo, Reserva, PerfilUso, ListaCobranca
 ├── Categoria, SituacaoCopia, SituacaoReserva (enums)
 ├── Constantes, Datas, Validador, Sessao
-├── dao/   DAO (classe-mãe), ObraDAO, CopiaDAO, LeitorDAO, FuncionarioDAO,
+├── dao/   DAO (classe-mãe), LivroDAO, CopiaDAO, LeitorDAO, FuncionarioDAO,
 │          EmprestimoDAO, ReservaDAO, BancoDados
-└── ui/    FrmLogin, FrmPrincipal, FrmObra, FrmLeitor, FrmFuncionario, FrmEmprestimo,
+└── ui/    FrmLogin, FrmPrincipal, FrmLivro, FrmLeitor, FrmFuncionario, FrmEmprestimo,
            FrmDevolucao, FrmReserva, FrmConsulta*, FrmRel*, FrmExportarCobranca, ...
 ```
 
@@ -47,7 +47,7 @@ src/main/java/com/fatec/biblioteca/
 
 | Menu | Telas | RF |
 |---|---|---|
-| Cadastros | Obras, Adicionar exemplares, Leitores, Funcionários (só Bibliotecário) | RF01, RF02, RF04, RF06 |
+| Cadastros | Livros, Adicionar exemplares, Leitores, Funcionários (só Bibliotecário) | RF01, RF02, RF04, RF06 |
 | Circulação | Realizar empréstimo, Registrar devolução, Reservas | RF08, RF09 |
 | Consultas | Acervo (filtro por categoria), Leitores, Empréstimos em aberto, Reservas | RF03, RF05, RF07, RF10 |
 | Relatórios | Disponíveis e emprestados, Atrasos e multas, Perfil de uso, Exportar lista de cobrança | RF11–RF14 |

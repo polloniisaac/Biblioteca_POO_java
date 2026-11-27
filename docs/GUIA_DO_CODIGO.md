@@ -34,11 +34,11 @@
 
 É um sistema desktop para a **Biblioteca Comunitária Vila Leitura** (o Tema 4 da especificação). Ele controla:
 
-- **Obras** (títulos do acervo) e suas **cópias** (exemplares físicos, cada um com etiqueta tipo `101-2`);
+- **Livros** (títulos do acervo) e suas **cópias** (exemplares físicos, cada um com etiqueta tipo `101-2`);
 - **Leitores**, de três tipos: Estudante, Professor e Comunidade, cada um com prazo e limite próprios;
 - **Funcionários**, de dois cargos: Bibliotecário e Voluntário, com login e senha;
 - **Empréstimos** e **devoluções**, com cálculo de atraso e multa (R$ 0,50 por dia);
-- **Reservas** com fila por obra, separação da cópia por 3 dias e expiração;
+- **Reservas** com fila por livro, separação da cópia por 3 dias e expiração;
 - **Relatórios**: acervo, circulação, atrasos e multas, perfil de uso (matriz tipo de leitor x categoria) e exportação da lista de cobrança em `.txt`.
 
 ## 1.2 Tecnologias
@@ -61,17 +61,17 @@ O projeto segue a mesma organização do exemplo `poo12` do professor (`Cliente`
 ```
             ┌─────────────────────────────────────────────┐
   Usuário → │  ui  (telas Swing: FrmLogin, FrmPrincipal,  │
-            │       FrmObra, FrmEmprestimo, FrmRel*, ...)  │  ← captura erros e mostra mensagens
+            │       FrmLivro, FrmEmprestimo, FrmRel*, ...)  │  ← captura erros e mostra mensagens
             └───────────────┬─────────────────────────────┘
                             │ cria objetos e chama métodos
             ┌───────────────▼─────────────────────────────┐
             │  com.fatec.biblioteca (entidades / modelo)   │
-            │  Pessoa, Leitor, Funcionario, Obra, Copia,   │  ← regras de negócio (validam
+            │  Pessoa, Leitor, Funcionario, Livro, Copia,   │  ← regras de negócio (validam
             │  Emprestimo, Reserva, PerfilUso, enums ...   │     e lançam Exception)
             └───────────────┬─────────────────────────────┘
                             │ objetos prontos são gravados/lidos
             ┌───────────────▼─────────────────────────────┐
-            │  dao  (DAO abstrata + ObraDAO, CopiaDAO,     │  ← SQL, JDBC, transações
+            │  dao  (DAO abstrata + LivroDAO, CopiaDAO,     │  ← SQL, JDBC, transações
             │        LeitorDAO, FuncionarioDAO,            │     (lança SQLException)
             │        EmprestimoDAO, ReservaDAO, BancoDados)│
             └───────────────┬─────────────────────────────┘
@@ -99,14 +99,14 @@ Biblioteca_System/
     │   ├── Main.java
     │   ├── Pessoa, Leitor, Estudante, Professor, Comunidade
     │   ├── Funcionario, Bibliotecario, Voluntario
-    │   ├── Obra, Copia, Emprestimo, Reserva, PerfilUso, ListaCobranca
+    │   ├── Livro, Copia, Emprestimo, Reserva, PerfilUso, ListaCobranca
     │   ├── Categoria, SituacaoCopia, SituacaoReserva          (enums)
     │   ├── Constantes, Datas, Validador, Sessao               (utilitárias)
-    │   ├── dao/  DAO, BancoDados, ObraDAO, CopiaDAO, LeitorDAO,
+    │   ├── dao/  DAO, BancoDados, LivroDAO, CopiaDAO, LeitorDAO,
     │   │         FuncionarioDAO, EmprestimoDAO, ReservaDAO
-    │   └── ui/   FrmLogin, FrmPrincipal, FrmObra, FrmAdicionarCopias, FrmLeitor,
+    │   └── ui/   FrmLogin, FrmPrincipal, FrmLivro, FrmAdicionarCopias, FrmLeitor,
     │             FrmFuncionario, FrmEmprestimo, FrmDevolucao, FrmReserva,
-    │             FrmConsultaObras, FrmConsultaLeitores, FrmConsultaFuncionarios,
+    │             FrmConsultaLivros, FrmConsultaLeitores, FrmConsultaFuncionarios,
     │             FrmConsultaReservas, FrmEmprestimosAbertos, FrmRelCirculacao,
     │             FrmRelAtrasos, FrmRelPerfilUso, FrmExportarCobranca,
     │             FrmAlterarSenha, Estilo, Mensagem, Tabela, PainelFundo
@@ -133,15 +133,15 @@ Números para ter na ponta da língua: **22 tipos no pacote raiz** (19 classes e
   7d / 2     14d / 4    7d / 1        gerencia: sim     gerencia: não
 
 
-  Obra ◆────────── Copia            (composição: a obra cria as suas cópias)
+  Livro ◆────────── Copia            (composição: o livro cria as suas cópias)
    │  1        0..*  - situacao : SituacaoCopia
    │
    ◇── filaReservas : List<Reserva> (agregação)
 
   Emprestimo ──► Copia, Leitor, Funcionario (empréstimo), Funcionario (devolução)   (associação)
-  Reserva    ──► Obra, Leitor, Funcionario, Copia separada                         (associação)
+  Reserva    ──► Livro, Leitor, Funcionario, Copia separada                         (associação)
 
-  «abstract» DAO ◄── ObraDAO, CopiaDAO, LeitorDAO, FuncionarioDAO, EmprestimoDAO, ReservaDAO
+  «abstract» DAO ◄── LivroDAO, CopiaDAO, LeitorDAO, FuncionarioDAO, EmprestimoDAO, ReservaDAO
   JFrame ◄── todas as telas Frm*      DefaultTableModel ◄── Tabela      JPanel ◄── PainelFundo
 ```
 
@@ -167,11 +167,11 @@ Números para ter na ponta da língua: **22 tipos no pacote raiz** (19 classes e
 **Roteiro sugerido para a demonstração ao vivo:**
 
 1. Login com `admin` → mostrar a tela principal com os cartões e o menu.
-2. Cadastrar uma obra com 1 exemplar → mostrar a ficha (RF04).
+2. Cadastrar um livro com 1 exemplar → mostrar a ficha (RF04).
 3. Cadastrar um leitor Comunidade (limite 1).
-4. Emprestar a obra → mensagem com nº do empréstimo e data prevista (+7 dias).
-5. Tentar emprestar outra obra para o mesmo leitor → erro de limite (RN07).
-6. Com outro leitor, tentar emprestar a mesma obra → "não há exemplares" → fazer reserva.
+4. Emprestar o livro → mensagem com nº do empréstimo e data prevista (+7 dias).
+5. Tentar emprestar outro livro para o mesmo leitor → erro de limite (RN07).
+6. Com outro leitor, tentar emprestar a mesmo livro → "não há exemplares" → fazer reserva.
 7. Devolver com data atrasada → multa calculada → mensagem "exemplar separado para a reserva".
 8. Mostrar Relatórios: Atrasos e multas, Perfil de uso, Exportar lista de cobrança.
 9. Trocar usuário para o Voluntário que você cadastrou → botão "Funcionários" desabilitado (polimorfismo).
@@ -232,19 +232,19 @@ public abstract class Pessoa {
 | `calcularDataPrevista(LocalDate)` | `dataEmprestimo.plusDays(getPrazoDias())` (RN10). A chamada polimórfica decide se soma 7 ou 14. |
 | `atingiuLimite()` | `getQtdEmprestimosAbertos() >= getLimiteLivros()` (RN07). |
 | `getEmprestimoEmAtraso(LocalDate)` | Procura um empréstimo aberto com data prevista anterior à data informada (RN08). |
-| `possuiObraEmprestada(int codigoObra)` | Já está com essa obra? (RN09). |
-| `validarNovoEmprestimo(Obra, LocalDate) throws Exception` | Junta RN07, RN08 e RN09; lança `Exception` com mensagem amigável na primeira regra violada. |
-| `validarNovaReserva(Obra, LocalDate) throws Exception` | Regras de reserva R1 a R3 (atraso, já está com a obra, já tem reserva viva, ainda há cópia disponível). |
+| `possuiLivroEmprestado(int codigoLivro)` | Já está com esse livro? (RN09). |
+| `validarNovoEmprestimo(Livro, LocalDate) throws Exception` | Junta RN07, RN08 e RN09; lança `Exception` com mensagem amigável na primeira regra violada. |
+| `validarNovaReserva(Livro, LocalDate) throws Exception` | Regras de reserva R1 a R3 (atraso, já está com o livro, já tem reserva viva, ainda há cópia disponível). |
 | `getSituacao()` | Texto `"1 de 2"` pedido no RF07. |
 | `setEmprestimosAbertos(List)` | Guarda a lista e atualiza a quantidade. |
 | `getQtdEmprestimosAbertos()` | `Math.max(contador, lista.size())`: funciona tanto quando veio a lista quanto quando veio só a contagem. |
 
 ```java
-public void validarNovoEmprestimo(Obra obra, LocalDate data) throws Exception {
+public void validarNovoEmprestimo(Livro livro, LocalDate data) throws Exception {
     if (atingiuLimite()) { throw new Exception("Limite de empréstimos simultâneos atingido ..."); } // RN07
     Emprestimo atrasado = getEmprestimoEmAtraso(data);
     if (atrasado != null) { throw new Exception("O leitor possui empréstimo em atraso ..."); }      // RN08
-    if (possuiObraEmprestada(obra.getCodigo())) { throw new Exception("... desta obra."); }         // RN09
+    if (possuiLivroEmprestado(livro.getCodigo())) { throw new Exception("... deste livro."); }         // RN09
 }
 ```
 
@@ -290,9 +290,9 @@ Ponto para a apresentação: no PDF a política está em **arrays paralelos** (`
 | `Bibliotecario` | 1 | `true` | "Bibliotecário" |
 | `Voluntario` | 2 | `false` | "Voluntário" |
 
-### `Obra`: classe concreta
+### `Livro`: classe concreta
 
-- **Papel:** o título do acervo (o "Livro" do PDF). Dona das suas cópias e da fila de reservas.
+- **Papel:** o título do acervo (mesmo nome usado no PDF). Dono das suas cópias e da fila de reservas.
 
 | Atributo | Tipo | Observação |
 |---|---|---|
@@ -307,7 +307,7 @@ Ponto para a apresentação: no PDF a política está em **arrays paralelos** (`
 |---|---|
 | `setCodigo`, `setTitulo`, `setAutor`, `setCategoria`, `setAnoPublicacao` (todos `throws Exception`) | Cada setter valida a sua regra. É o **encapsulamento** fazendo a validação. |
 | `adicionarCopias(int quantidade)` | Valida 1 a 50 (RN04), descobre o próximo número livre e cria as cópias com `new Copia(this, numero)`. Devolve só as novas, para o DAO gravar. |
-| `adicionarCopiaCarregada(Copia)` | Usado pelo DAO ao ler do banco: liga a cópia à obra. |
+| `adicionarCopiaCarregada(Copia)` | Usado pelo DAO ao ler do banco: liga a cópia ao livro. |
 | `getTotalCopias()`, `getQtdDisponiveis()`, `getQtdEmprestadas()`, `getQtdReservadas()` | Contam as cópias por situação (método privado `contar(SituacaoCopia)`). |
 | `getCopia(int codigoCopia)` | Busca uma cópia pelo código. |
 | `getCopiaParaEmprestimo(Leitor) throws Exception` | Se o leitor tem reserva AGUARDANDO, devolve a cópia separada para ele; senão, a primeira DISPONÍVEL; se não houver, lança "Não há exemplares disponíveis... faça uma reserva" (RN06). |
@@ -316,28 +316,28 @@ Ponto para a apresentação: no PDF a política está em **arrays paralelos** (`
 | `getPosicaoNaFila(Reserva)` | 1º, 2º, ... contando só as reservas vivas. |
 | `toString()` | `"codigo - titulo"`. |
 
-**Detalhe importante:** a obra **não guarda** "quantidade disponível" num atributo, como o array `exemplaresDisponiveis` do PDF. A quantidade é **calculada** a partir da situação de cada cópia. Por isso a RN15 (disponíveis entre 0 e o total) é sempre verdadeira por construção.
+**Detalhe importante:** o livro **não guarda** "quantidade disponível" num atributo, como o array `exemplaresDisponiveis` do PDF. A quantidade é **calculada** a partir da situação de cada cópia. Por isso a RN15 (disponíveis entre 0 e o total) é sempre verdadeira por construção.
 
 ### `Copia`: classe concreta
 
-- **Papel:** um exemplar físico. Parte da `Obra` (**composição**).
+- **Papel:** um exemplar físico. Parte do `Livro` (**composição**).
 
 | Atributo | Tipo |
 |---|---|
 | `codigo` | `int` (gerado pelo banco, `AUTO_INCREMENT`) |
-| `obra` | `Obra` |
-| `numero` | `int` (1, 2, 3... dentro da obra) |
+| `livro` | `Livro` |
+| `numero` | `int` (1, 2, 3... dentro do livro) |
 | `situacao` | `SituacaoCopia` (começa `DISPONIVEL`) |
 
 | Método | O que faz |
 |---|---|
-| construtor `Copia(Obra, int)` **sem `public`** (visibilidade de pacote) | Só classes do mesmo pacote criam cópias "novas", na prática a `Obra.adicionarCopias`. Reforça a composição. |
+| construtor `Copia(Livro, int)` **sem `public`** (visibilidade de pacote) | Só classes do mesmo pacote criam cópias "novas", na prática o `Livro.adicionarCopias`. Reforça a composição. |
 | construtor `public Copia()` | Usado pelos DAOs ao montar a partir do banco. |
 | `emprestar() throws Exception` | Se já está EMPRESTADA → erro; senão vira EMPRESTADA. |
 | `devolver() throws Exception` | Só pode devolver se está EMPRESTADA; volta a DISPONIVEL. |
 | `reservar() throws Exception` | Só se DISPONIVEL; vira RESERVADA (separada para alguém da fila). |
 | `liberar()` | Se RESERVADA, volta a DISPONIVEL (reserva cancelada ou expirada). |
-| `getEtiqueta()` | `"codigoObra-numero"`, ex.: `101-2`. |
+| `getEtiqueta()` | `"codigoLivro-numero"`, ex.: `101-2`. |
 
 A situação só muda **pelos métodos de negócio** (`emprestar`, `devolver`, `reservar`, `liberar`), que conferem se a transição é válida. Isso é uma pequena **máquina de estados** e é o comentário "RN15" no topo da classe.
 
@@ -372,7 +372,7 @@ A situação só muda **pelos métodos de negócio** (`emprestar`, `devolver`, `
 | `calcularMulta(LocalDate)` | `diasAtraso * Constantes.MULTA_POR_DIA` (RN12). |
 | `registrarDevolucao(LocalDate, Funcionario) throws Exception` | Valida RN11 (não devolvido ainda; data não anterior ao empréstimo), chama `copia.devolver()`, guarda data, funcionário e multa. |
 | `getStatus(LocalDate)` | `"NO PRAZO"` ou `"ATRASADO há N dia(s)"` (RF10). |
-| `getObra()` | Atalho para `copia.getObra()`. |
+| `getLivro()` | Atalho para `copia.getLivro()`. |
 
 ```java
 public int calcularDiasAtraso(LocalDate dataReferencia) {
@@ -383,13 +383,13 @@ public int calcularDiasAtraso(LocalDate dataReferencia) {
 
 ### `Reserva`: classe concreta
 
-- **Papel:** pedido de um leitor por uma obra sem exemplar disponível. **Associação** com `Obra`, `Leitor`, `Funcionario` e a `Copia` separada.
+- **Papel:** pedido de um leitor por um livro sem exemplar disponível. **Associação** com `Livro`, `Leitor`, `Funcionario` e a `Copia` separada.
 - **Observação:** reservas **não estão no PDF** (que é da disciplina de LP1). Foram acrescentadas porque o professor de POO pediu "controlar reservas". As regras R1 a R7 vêm da proposta do projeto (ver Parte 7.3).
 
 | Atributo | Tipo |
 |---|---|
 | `codigo` | `int` |
-| `obra`, `leitor`, `funcionario` | `Obra`, `Leitor`, `Funcionario` |
+| `livro`, `leitor`, `funcionario` | `Livro`, `Leitor`, `Funcionario` |
 | `dataReserva` | `LocalDate` |
 | `copiaSeparada` | `Copia` (preenchida quando chega a vez do leitor) |
 | `dataLimiteRetirada` | `LocalDate` (separação + 3 dias) |
@@ -472,7 +472,7 @@ public enum Categoria {
 
 | Constante | Valor | Regra |
 |---|---|---|
-| `MAX_OBRAS` | 200 | RN14 (MAX_LIVROS do PDF) |
+| `MAX_LIVROS` | 200 | RN14 (mesmo nome do PDF) |
 | `MAX_LEITORES` | 100 | RN14 |
 | `MAX_EMPRESTIMOS` | 500 | RN14 |
 | `EXEMPLARES_MIN` / `EXEMPLARES_MAX` | 1 / 50 | RN04 |
@@ -529,30 +529,30 @@ public static void main(String[] args) {
 | `criarNovaTabela()` **abstrato** | Cada DAO cria a sua tabela (mesmo nome de método do `poo12`). |
 | `executar(String sql)` (`protected`) | Executa um comando simples com try-with-resources. |
 | `paraSql(LocalDate)` / `paraLocalDate(Date)` | Conversão `java.time.LocalDate` ↔ `java.sql.Date`. |
-| `montarLeitor`, `montarFuncionario`, `montarObra` | Reconstroem objetos a partir das colunas. Usam os métodos fábrica (`Leitor.criar`) e os setters (que validam). Se algo vier inválido do banco, a `Exception` vira `SQLException` ("Leitor 5 inválido no banco: ..."). |
+| `montarLeitor`, `montarFuncionario`, `montarLivro` | Reconstroem objetos a partir das colunas. Usam os métodos fábrica (`Leitor.criar`) e os setters (que validam). Se algo vier inválido do banco, a `Exception` vira `SQLException` ("Leitor 5 inválido no banco: ..."). |
 
-### `ObraDAO`: classe (herda `DAO`)
+### `LivroDAO`: classe (herda `DAO`)
 
 | Método | SQL / o que faz |
 |---|---|
-| `criarNovaTabela()` | `CREATE TABLE IF NOT EXISTS obra (...)` com CHECKs. |
-| `inserir(Obra, List<Copia>)` | **Transação**: `INSERT` da obra + `INSERT` de cada cópia; `commit` ou `rollback` (RF01). |
-| `alterar(Obra)` | `UPDATE obra SET titulo, autor, categoria, ano_publicacao`. |
-| `remover(int)` | Transação: apaga as cópias e depois a obra. |
-| `possuiMovimentacao(int)` | Conta empréstimos e reservas da obra (para impedir exclusão). |
-| `carregar(int)` e `carregar(Connection, int)` | **Sobrecarga**. Lê a obra e preenche as cópias (`CopiaDAO.carregarCopias`) e a fila (`ReservaDAO.carregarFila`). A versão com `Connection` serve para participar da transação de outro DAO. |
-| `listar(Categoria)` | Lista o acervo (`null` = todas, RF03; com categoria, RF05). Lê obras e cópias em 2 consultas e liga as cópias às obras com um `HashMap<Integer, Obra>`. |
+| `criarNovaTabela()` | `CREATE TABLE IF NOT EXISTS livro (...)` com CHECKs. |
+| `inserir(Livro, List<Copia>)` | **Transação**: `INSERT` do livro + `INSERT` de cada cópia; `commit` ou `rollback` (RF01). |
+| `alterar(Livro)` | `UPDATE livro SET titulo, autor, categoria, ano_publicacao`. |
+| `remover(int)` | Transação: apaga as cópias e depois o livro. |
+| `possuiMovimentacao(int)` | Conta empréstimos e reservas do livro (para impedir exclusão). |
+| `carregar(int)` e `carregar(Connection, int)` | **Sobrecarga**. Lê o livro e preenche as cópias (`CopiaDAO.carregarCopias`) e a fila (`ReservaDAO.carregarFila`). A versão com `Connection` serve para participar da transação de outro DAO. |
+| `listar(Categoria)` | Lista o acervo (`null` = todas, RF03; com categoria, RF05). Lê livros e cópias em 2 consultas e liga as cópias aos livros com um `HashMap<Integer, Livro>`. |
 | `contar()` | `SELECT COUNT(*)` (RN14 e resumo da carga). |
 
 ### `CopiaDAO`: classe (herda `DAO`)
 
 | Método | O que faz |
 |---|---|
-| `criarNovaTabela()` | Tabela `copia` com `UNIQUE(obra_codigo, numero)` e CHECK de situação. |
+| `criarNovaTabela()` | Tabela `copia` com `UNIQUE(livro_codigo, numero)` e CHECK de situação. |
 | `inserir(Connection, Copia)` | `INSERT` com `RETURN_GENERATED_KEYS` para pegar o código gerado. |
-| `adicionarCopias(Obra, List<Copia>)` | Transação do RF02: grava as cópias e chama `ReservaDAO.atualizarFila` para separar cópias para quem estava na fila. Devolve quantas foram separadas. |
+| `adicionarCopias(Livro, List<Copia>)` | Transação do RF02: grava as cópias e chama `ReservaDAO.atualizarFila` para separar cópias para quem estava na fila. Devolve quantas foram separadas. |
 | `atualizarSituacao(Connection, Copia)` | `UPDATE copia SET situacao=?`. |
-| `carregarCopias(Connection, Obra)` | Preenche a lista de cópias da obra. |
+| `carregarCopias(Connection, Livro)` | Preenche a lista de cópias do livro. |
 | `verificarConsistencia()` | RF15/RN18: compara a situação gravada de cada cópia com a esperada (pelos empréstimos abertos e reservas aguardando), corrige e devolve os avisos. |
 | `contar()` | Total de cópias. |
 
@@ -584,13 +584,13 @@ public static void main(String[] args) {
 
 | Método | O que faz |
 |---|---|
-| constante `SELECT` | Consulta base com `JOIN` em `copia`, `obra`, `leitor` e `funcionario` (duas vezes: `fe` = quem emprestou, `fd` = quem recebeu, com `LEFT JOIN`). |
+| constante `SELECT` | Consulta base com `JOIN` em `copia`, `livro`, `leitor` e `funcionario` (duas vezes: `fe` = quem emprestou, `fd` = quem recebeu, com `LEFT JOIN`). |
 | `criarNovaTabela()` | Tabela `emprestimo` com a coluna gerada `copia_aberta` + `UNIQUE` (ver Parte 5). |
 | `registrarEmprestimo(Emprestimo, Reserva)` | **Transação** do RF08: `INSERT` do empréstimo, `UPDATE` da cópia e, se havia reserva, marca como ATENDIDA. |
 | `registrarDevolucao(Emprestimo)` | **Transação** do RF09: `UPDATE ... WHERE codigo=? AND data_devolucao IS NULL` (se não alterar 1 linha → "já foi devolvido"), atualiza a cópia e anda a fila de reservas. |
 | `carregar(int)` | Um empréstimo pelo código. |
 | `listarAbertosPorLeitor(Leitor)` | Para a agregação do leitor. |
-| `listarAbertosPorObra(int)` | Para a ficha da obra (RF04). |
+| `listarAbertosPorLivro(int)` | Para a ficha do livro (RF04). |
 | `listarAbertos()` | RF10. |
 | `listarAtrasados(LocalDate)` | RF12 (b) e RF14. |
 | `listarDevolvidosComMulta()` | RF12 (a). |
@@ -603,14 +603,14 @@ public static void main(String[] args) {
 
 | Método | O que faz |
 |---|---|
-| `criarNovaTabela()` | Tabela `reserva` com colunas geradas `viva_leitor`/`viva_obra` + `UNIQUE` (1 reserva viva por leitor e obra). |
-| `inserir(Reserva)` | Grava e coloca a reserva na fila da obra em memória. |
+| `criarNovaTabela()` | Tabela `reserva` com colunas geradas `viva_leitor`/`viva_livro` + `UNIQUE` (1 reserva viva por leitor e livro). |
+| `inserir(Reserva)` | Grava e coloca a reserva na fila do livro em memória. |
 | `atualizar(Connection, Reserva)` | Grava situação, cópia separada, prazo e código do empréstimo. |
 | `salvarCancelamento(Reserva, LocalDate)` | Transação do R7: grava o cancelamento, libera a cópia e anda a fila. |
-| `atualizarFila(Connection, int codigoObra, LocalDate)` | **O coração das reservas**: expira as vencidas (R6) e, enquanto houver cópia DISPONÍVEL, separa para a próxima reserva ATIVA da fila (R4). Devolve as reservas que receberam cópia, para a tela avisar. |
-| `expirarVencidas(LocalDate)` | Procura obras com reservas AGUARDANDO vencidas e chama `atualizarFila` para cada uma. É chamada antes de emprestar e antes de reservar. |
-| `carregarFila(Connection, Obra)` | Preenche a fila (reservas vivas em ordem de código). |
-| `carregarViva(int)` | Carrega a obra inteira e devolve a reserva viva com aquele código (assim a reserva vem ligada à cópia certa). |
+| `atualizarFila(Connection, int codigoLivro, LocalDate)` | **O coração das reservas**: expira as vencidas (R6) e, enquanto houver cópia DISPONÍVEL, separa para a próxima reserva ATIVA da fila (R4). Devolve as reservas que receberam cópia, para a tela avisar. |
+| `expirarVencidas(LocalDate)` | Procura livros com reservas AGUARDANDO vencidas e chama `atualizarFila` para cada uma. É chamada antes de emprestar e antes de reservar. |
+| `carregarFila(Connection, Livro)` | Preenche a fila (reservas vivas em ordem de código). |
+| `carregarViva(int)` | Carrega o livro inteiro e devolve a reserva viva com aquele código (assim a reserva vem ligada à cópia certa). |
 | `listar(boolean somenteVivas)` | Para a tela de consulta de reservas. |
 
 ### `BancoDados`: classe concreta
@@ -626,14 +626,14 @@ Todas as telas são **classes que herdam de `JFrame`**, no mesmo molde do `FrmCl
 |---|---|---|---|---|
 | `FrmLogin` | classe | `JFrame` | Login com `JPasswordField`; autentica e guarda na `Sessao`. | (acesso) |
 | `FrmPrincipal` | classe | `JFrame` | Cartões de atalho + barra de menus; aplica permissão por cargo. | todos |
-| `FrmObra` | classe | `JFrame` | Consultar, inserir, alterar, excluir obra; ficha com cópias, empréstimos abertos e fila. | RF01, RF04 |
-| `FrmAdicionarCopias` | classe | `JFrame` | Adicionar exemplares a uma obra existente. | RF02 |
+| `FrmLivro` | classe | `JFrame` | Consultar, inserir, alterar, excluir livro; ficha com cópias, empréstimos abertos e fila. | RF01, RF04 |
+| `FrmAdicionarCopias` | classe | `JFrame` | Adicionar exemplares a um livro existente. | RF02 |
 | `FrmLeitor` | classe | `JFrame` | CRUD de leitor; mostra prazo, limite e empréstimos abertos. | RF06 |
 | `FrmFuncionario` | classe | `JFrame` | CRUD de funcionários (só Bibliotecário acessa). | (POO) |
 | `FrmEmprestimo` | classe | `JFrame` | Realizar empréstimo; mostra nome do leitor e livro ao sair do campo. | RF08 |
 | `FrmDevolucao` | classe | `JFrame` | Registrar devolução, mostrar multa e reservas atendidas. | RF09 |
 | `FrmReserva` | classe | `JFrame` | Reservar e cancelar reserva. | R1–R7 |
-| `FrmConsultaObras` | classe | `JFrame` | `JTable` do acervo com filtro de categoria e totais. | RF03, RF05 |
+| `FrmConsultaLivros` | classe | `JFrame` | `JTable` do acervo com filtro de categoria e totais. | RF03, RF05 |
 | `FrmConsultaLeitores` | classe | `JFrame` | Leitores com "1 de 2". | RF07 |
 | `FrmConsultaFuncionarios` | classe | `JFrame` | Lista de funcionários. | (POO) |
 | `FrmConsultaReservas` | classe | `JFrame` | Reservas com posição na fila. | (POO) |
@@ -650,11 +650,11 @@ Todas as telas são **classes que herdam de `JFrame`**, no mesmo molde do `FrmCl
 
 Detalhes que valem citar:
 
-- **`FrmPrincipal.item(String, Supplier<JFrame>)` e `atalho(...)`** recebem a tela como **referência de construtor** (`FrmObra::new`). `Supplier` é uma **interface funcional** do Java: cada clique cria uma nova janela com `tela.get()`.
+- **`FrmPrincipal.item(String, Supplier<JFrame>)` e `atalho(...)`** recebem a tela como **referência de construtor** (`FrmLivro::new`). `Supplier` é uma **interface funcional** do Java: cada clique cria uma nova janela com `tela.get()`.
 - **`Estilo.padronizar(this)`** é chamado no fim de cada construtor de tela: põe o cabeçalho com a imagem da estante, aplica bordas e pinta botões "primários" (Inserir, Salvar...) de azul e "perigosos" (Excluir, Cancelar reserva) de vermelho, percorrendo os componentes **recursivamente** e usando `instanceof`.
 - **`Estilo.aplicarTema(boolean)`** salva a escolha com `java.util.prefs.Preferences`, então o tema escuro continua na próxima vez que abrir.
 - **`PainelFundo`** tem um `static Map<String, Image> CACHE` para não ler a imagem do disco toda vez que repinta.
-- **`FrmEmprestimo`** usa `FocusAdapter` como **classe anônima** (sobrescreve `focusLost`) para buscar o leitor e a obra quando o usuário sai do campo.
+- **`FrmEmprestimo`** usa `FocusAdapter` como **classe anônima** (sobrescreve `focusLost`) para buscar o leitor e o livro quando o usuário sai do campo.
 - **`FrmEmprestimosAbertos`** usa `DefaultTableCellRenderer` anônimo (sobrescreve `getTableCellRendererComponent`) para pintar de vermelho (`Estilo.VERMELHO`) a linha cujo status começa com "ATRASADO"; as outras usam a cor do tema (`t.getForeground()`), então funciona no claro e no escuro.
 
 ---
@@ -663,15 +663,15 @@ Detalhes que valem citar:
 
 ## 4.1 Classe e objeto
 
-- **Classe** é o molde; **objeto** é a instância. Ex.: `Obra` é a classe; `new Obra()` em `FrmObra.lerCampos()` cria um objeto com os dados digitados.
+- **Classe** é o molde; **objeto** é a instância. Ex.: `Livro` é a classe; `new Livro()` em `FrmLivro.lerCampos()` cria um objeto com os dados digitados.
 - Cada tela também é um objeto: `new FrmEmprestimo().setVisible(true)`.
 
 ## 4.2 Encapsulamento
 
-Todos os atributos das entidades são `private`. O acesso é feito por getters e setters, e os **setters validam**. Assim é impossível ter uma `Obra` com código 50 ou título vazio.
+Todos os atributos das entidades são `private`. O acesso é feito por getters e setters, e os **setters validam**. Assim é impossível ter um `Livro` com código 50 ou título vazio.
 
 ```java
-// Obra.java
+// Livro.java
 public void setCodigo(int codigo) throws Exception {
     if (codigo < 100 || codigo > 9999) {
         throw new Exception("O código do livro deve ser de 100 a 9999.");   // RN01
@@ -684,7 +684,7 @@ Outros exemplos:
 
 - `Copia` **não tem regra pública para mudar a situação direto** no uso normal: o fluxo usa `emprestar()`, `devolver()`, `reservar()`, `liberar()`, que conferem a transição. (O `setSituacao` existe só para o DAO reconstruir o objeto.)
 - `Funcionario` nunca guarda a senha em texto: `setSenha` grava só o hash; o hash fica `private`.
-- O construtor `Copia(Obra, int)` não é `public` (visibilidade de pacote).
+- O construtor `Copia(Livro, int)` não é `public` (visibilidade de pacote).
 - Listas `copias` e `filaReservas` são `final` (a referência não pode ser trocada).
 
 ## 4.3 Herança
@@ -694,7 +694,7 @@ Outros exemplos:
 | `Pessoa` (abstrata) | `Leitor`, `Funcionario` | `codigo`, `nome`, getters/setters, `toString()` |
 | `Leitor` (abstrata) | `Estudante`, `Professor`, `Comunidade` | toda a lógica de validação de empréstimo e reserva |
 | `Funcionario` (abstrata) | `Bibliotecario`, `Voluntario` | login, senha, `autenticar()` |
-| `DAO` (abstrata) | `ObraDAO`, `CopiaDAO`, `LeitorDAO`, `FuncionarioDAO`, `EmprestimoDAO`, `ReservaDAO` | conexão (`getConnection`), `executar`, conversão de datas, `montar*` |
+| `DAO` (abstrata) | `LivroDAO`, `CopiaDAO`, `LeitorDAO`, `FuncionarioDAO`, `EmprestimoDAO`, `ReservaDAO` | conexão (`getConnection`), `executar`, conversão de datas, `montar*` |
 | `JFrame` (Swing) | todas as 19 telas `Frm*` | janela, título, tamanho, layout |
 | `DefaultTableModel` (Swing) | `Tabela` | modelo de dados da `JTable` |
 | `JPanel` (Swing) | `PainelFundo` | painel, com `paintComponent` sobrescrito |
@@ -749,7 +749,7 @@ Outro exemplo, o de **permissão**:
 btnFuncionarios.setEnabled(usuario.podeGerenciarCadastros());
 ```
 
-Outros: `getDescricaoTipo()` (mostrado nas tabelas), `toString()` (em `Pessoa`, `Obra`, `Categoria`), `criarNovaTabela()` (cada DAO cria a sua), `isCellEditable` em `Tabela`, `paintComponent` em `PainelFundo`.
+Outros: `getDescricaoTipo()` (mostrado nas tabelas), `toString()` (em `Pessoa`, `Livro`, `Categoria`), `criarNovaTabela()` (cada DAO cria a sua), `isCellEditable` em `Tabela`, `paintComponent` em `PainelFundo`.
 
 ### b) Sobrecarga (polimorfismo estático, em tempo de compilação)
 
@@ -761,7 +761,7 @@ public int calcularDiasAtraso()                          // usa a data da devolu
 public int calcularDiasAtraso(LocalDate dataReferencia)  // usa uma data de referência
 ```
 
-Também: `ObraDAO.carregar(int)` e `ObraDAO.carregar(Connection, int)`; os dois construtores de `Copia`, `Emprestimo`, `Reserva` e `PainelFundo` (sobrecarga de construtores, com `this(...)` em `PainelFundo`).
+Também: `LivroDAO.carregar(int)` e `LivroDAO.carregar(Connection, int)`; os dois construtores de `Copia`, `Emprestimo`, `Reserva` e `PainelFundo` (sobrecarga de construtores, com `this(...)` em `PainelFundo`).
 
 ### c) Referência da superclasse apontando para subclasse
 
@@ -778,20 +778,20 @@ Os três são relações "tem um", que diferem pela força do vínculo:
 
 | Relação | Onde | Por que é desse tipo |
 |---|---|---|
-| **Composição** (◆, a mais forte) | `Obra` ◆── `Copia` | A cópia não existe sem a obra: é criada **pela própria obra** (`obra.adicionarCopias(qtd)` → `new Copia(this, numero)`), tem a obra na etiqueta (`101-2`) e é apagada junto com ela (`ObraDAO.remover`). |
+| **Composição** (◆, a mais forte) | `Livro` ◆── `Copia` | A cópia não existe sem o livro: é criada **pelo próprio livro** (`livro.adicionarCopias(qtd)` → `new Copia(this, numero)`), tem o livro na etiqueta (`101-2`) e é apagada junto com ele (`LivroDAO.remover`). |
 | **Agregação** (◇) | `Leitor` ◇── `List<Emprestimo>` | O leitor "agrupa" seus empréstimos abertos, mas o empréstimo tem vida própria (continua existindo depois de devolvido, com histórico e multa). |
-| **Agregação** (◇) | `Obra` ◇── `List<Reserva>` (`filaReservas`) | A obra agrupa a fila; a reserva existe por conta própria (pode ser cancelada, expirar, virar empréstimo). |
+| **Agregação** (◇) | `Livro` ◇── `List<Reserva>` (`filaReservas`) | O livro agrupa a fila; a reserva existe por conta própria (pode ser cancelada, expirar, virar empréstimo). |
 | **Associação** (→) | `Emprestimo` → `Copia`, `Leitor`, `Funcionario` (x2) | O empréstimo "conhece" esses objetos, mas nenhum é dono do outro. |
-| **Associação** (→) | `Reserva` → `Obra`, `Leitor`, `Funcionario`, `Copia` | Idem. |
-| **Associação** (→) | `Copia` → `Obra` | Navegação de volta da cópia para a obra (`copia.getObra()`). |
+| **Associação** (→) | `Reserva` → `Livro`, `Leitor`, `Funcionario`, `Copia` | Idem. |
+| **Associação** (→) | `Copia` → `Livro` | Navegação de volta da cópia para o livro (`copia.getLivro()`). |
 | **Uso / dependência** | Telas → DAOs; `BancoDados` → DAOs | A tela tem um atributo `dao` e chama seus métodos. |
 
 Trechos para mostrar:
 
 ```java
-// Composição: Obra.adicionarCopias
+// Composição: Livro.adicionarCopias
 for (int i = 0; i < quantidade; i++) {
-    Copia c = new Copia(this, proximo + i);   // a obra cria as suas partes
+    Copia c = new Copia(this, proximo + i);   // o livro cria as suas partes
     copias.add(c);
     novas.add(c);
 }
@@ -812,10 +812,10 @@ O projeto **não declara uma `interface` própria**. A abstração foi feita com
 
 Mas o projeto **usa interfaces do Java**:
 
-- `Supplier<JFrame>` em `FrmPrincipal` (interface funcional, implementada com `FrmObra::new`).
+- `Supplier<JFrame>` em `FrmPrincipal` (interface funcional, implementada com `FrmLivro::new`).
 - `ActionListener`, implementada com **lambdas** em todos os botões: `btn.addActionListener(e -> inserir())`.
 - `List<...>` (interface) com `ArrayList` (implementação): `private List<Emprestimo> emprestimosAbertos = new ArrayList<>();`. Programar para a interface.
-- `Map<...>` com `HashMap` em `ObraDAO.listar` e `PainelFundo`.
+- `Map<...>` com `HashMap` em `LivroDAO.listar` e `PainelFundo`.
 - `Connection`, `PreparedStatement`, `ResultSet` do JDBC são interfaces; o driver do MySQL fornece as implementações.
 - `LayoutManager` no construtor de `PainelFundo`.
 
@@ -839,13 +839,13 @@ Vantagem: o compilador impede valores inválidos (não existe "categoria 7"), e 
 ## 4.10 Classes anônimas e lambdas
 
 - **Lambdas**: todos os `addActionListener(e -> ...)`.
-- **Referências de método/construtor**: `FrmObra::new`.
+- **Referências de método/construtor**: `FrmLivro::new`.
 - **Classes anônimas**: `new java.awt.event.FocusAdapter() { @Override public void focusLost(...) {...} }` em `FrmEmprestimo`; `new DefaultTableCellRenderer() { ... }` em `FrmEmprestimosAbertos`.
 
 ## 4.11 Coleções e arrays
 
 - `ArrayList` para cópias, filas, listas de resultados.
-- `HashMap` para ligar cópias às obras na listagem e para o cache de imagens.
+- `HashMap` para ligar cópias aos livros na listagem e para o cache de imagens.
 - `Set.of(...)` em `Estilo` para os textos dos botões primários/perigosos.
 - **Matriz** `int[3][5]` em `PerfilUso` (a mesma estrutura pedida no PDF).
 - `String[]` em `nomesTipos()`, `nomesCargos()`, `NOMES_TIPOS`.
@@ -853,7 +853,7 @@ Vantagem: o compilador impede valores inválidos (não existe "categoria 7"), e 
 
 ## 4.12 Resumo para a apresentação (cola de 1 minuto)
 
-> "Usamos **herança** em três hierarquias (Pessoa → Leitor/Funcionario → subclasses, e DAO → 6 DAOs). **Classes abstratas** obrigam cada tipo a dizer seu prazo, limite e permissão. Isso dá **polimorfismo**: o empréstimo chama `leitor.calcularDataPrevista()` e o próprio objeto decide se são 7 ou 14 dias, sem `if`. Temos **sobrecarga** em `calcularDiasAtraso`. A **composição** é Obra-Cópia, porque a obra cria e apaga as cópias; a **agregação** é o Leitor com os empréstimos abertos e a Obra com a fila de reservas; e a **associação** é o Empréstimo ligando cópia, leitor e funcionário. O **encapsulamento** está nos setters que validam as regras de negócio. O banco é acessado só pela **camada DAO**, e as **exceções** sobem até a tela, onde a classe `Mensagem` mostra o erro."
+> "Usamos **herança** em três hierarquias (Pessoa → Leitor/Funcionario → subclasses, e DAO → 6 DAOs). **Classes abstratas** obrigam cada tipo a dizer seu prazo, limite e permissão. Isso dá **polimorfismo**: o empréstimo chama `leitor.calcularDataPrevista()` e o próprio objeto decide se são 7 ou 14 dias, sem `if`. Temos **sobrecarga** em `calcularDiasAtraso`. A **composição** é Livro-Cópia, porque o livro cria e apaga as cópias; a **agregação** é o Leitor com os empréstimos abertos e o Livro com a fila de reservas; e a **associação** é o Empréstimo ligando cópia, leitor e funcionário. O **encapsulamento** está nos setters que validam as regras de negócio. O banco é acessado só pela **camada DAO**, e as **exceções** sobem até a tela, onde a classe `Mensagem` mostra o erro."
 
 ---
 
@@ -861,7 +861,7 @@ Vantagem: o compilador impede valores inválidos (não existe "categoria 7"), e 
 
 ## 5.1 Padrão DAO
 
-**DAO (Data Access Object)** isola o acesso ao banco. A tela chama `dao.inserir(obra)` e não sabe se é MySQL, SQLite ou arquivo. Se um dia trocar o banco, só a camada `dao` muda.
+**DAO (Data Access Object)** isola o acesso ao banco. A tela chama `dao.inserir(livro)` e não sabe se é MySQL, SQLite ou arquivo. Se um dia trocar o banco, só a camada `dao` muda.
 
 Comparação com o `poo12`:
 
@@ -901,12 +901,12 @@ try (Connection conn = getConnection()) {
 }
 ```
 
-Os métodos que recebem `Connection conn` como parâmetro (`CopiaDAO.inserir`, `atualizarSituacao`, `ReservaDAO.atualizar`, `atualizarFila`, `ObraDAO.carregar(conn, ...)`) existem justamente para participar da transação de outro DAO.
+Os métodos que recebem `Connection conn` como parâmetro (`CopiaDAO.inserir`, `atualizarSituacao`, `ReservaDAO.atualizar`, `atualizarFila`, `LivroDAO.carregar(conn, ...)`) existem justamente para participar da transação de outro DAO.
 
 ## 5.3 As 6 tabelas
 
 ```
- obra (1) ───< copia (N)
+ livro (1) ───< copia (N)
    │              │
    │              └───< emprestimo >─── leitor
    │                       │   └──── funcionario (empréstimo / devolução)
@@ -916,7 +916,7 @@ Os métodos que recebem `Connection conn` como parâmetro (`CopiaDAO.inserir`, `
            └──── emprestimo (quando atendida, opcional)
 ```
 
-### `obra`
+### `livro`
 
 | Coluna | Tipo | Restrição |
 |---|---|---|
@@ -930,8 +930,8 @@ Os métodos que recebem `Connection conn` como parâmetro (`CopiaDAO.inserir`, `
 | Coluna | Tipo | Restrição |
 |---|---|---|
 | `codigo` | INT AUTO_INCREMENT | PK |
-| `obra_codigo` | INT | FK → `obra` |
-| `numero` | INT | `>= 1`; `UNIQUE(obra_codigo, numero)` |
+| `livro_codigo` | INT | FK → `livro` |
+| `numero` | INT | `>= 1`; `UNIQUE(livro_codigo, numero)` |
 | `situacao` | VARCHAR(20) | `DISPONIVEL`, `EMPRESTADA` ou `RESERVADA` |
 
 ### `leitor`
@@ -972,30 +972,30 @@ Os métodos que recebem `Connection conn` como parâmetro (`CopiaDAO.inserir`, `
 | Coluna | Tipo | Restrição |
 |---|---|---|
 | `codigo` | INT AUTO_INCREMENT | PK (a ordem do código é a ordem da fila) |
-| `obra_codigo`, `leitor_codigo`, `funcionario_codigo` | INT | FKs |
+| `livro_codigo`, `leitor_codigo`, `funcionario_codigo` | INT | FKs |
 | `data_reserva` | DATE | |
 | `copia_codigo` | INT NULL | FK, cópia separada |
 | `data_limite_retirada` | DATE NULL | separação + 3 dias |
 | `emprestimo_codigo` | INT NULL | FK, quando ATENDIDA |
 | `situacao` | VARCHAR(20) | ATIVA, AGUARDANDO, ATENDIDA, CANCELADA, EXPIRADA |
-| `viva_leitor`, `viva_obra` | INT **geradas** | só têm valor se ATIVA/AGUARDANDO; `UNIQUE(viva_leitor, viva_obra)` |
+| `viva_leitor`, `viva_livro` | INT **geradas** | só têm valor se ATIVA/AGUARDANDO; `UNIQUE(viva_leitor, viva_livro)` |
 
-Mesmo truque: o banco impede que um leitor tenha **duas reservas vivas da mesma obra**.
+Mesmo truque: o banco impede que um leitor tenha **duas reservas vivas da mesmo livro**.
 
-Índices extras: `idx_emp_leitor_aberto (leitor_codigo, data_devolucao)` e `idx_res_fila (obra_codigo, situacao, codigo)`, para deixar rápidas as consultas mais usadas.
+Índices extras: `idx_emp_leitor_aberto (leitor_codigo, data_devolucao)` e `idx_res_fila (livro_codigo, situacao, codigo)`, para deixar rápidas as consultas mais usadas.
 
 ## 5.4 Do arquivo `.txt` do PDF para o banco
 
 | PDF (LP1) | Projeto |
 |---|---|
-| `livros.txt` (CODIGO;TITULO;AUTOR;CATEGORIA;ANO;TOTAL;DISPONIVEIS) | tabelas `obra` + `copia` (total e disponíveis são **contados** pelas cópias) |
+| `livros.txt` (CODIGO;TITULO;AUTOR;CATEGORIA;ANO;TOTAL;DISPONIVEIS) | tabelas `livro` + `copia` (total e disponíveis são **contados** pelas cópias) |
 | `leitores.txt` (CODIGO;NOME;TIPO) | tabela `leitor` (a quantidade de abertos é contada pelos empréstimos) |
 | `emprestimos.txt` (7 campos, dia do ano) | tabela `emprestimo` (com `DATE` e funcionários) |
-| Arrays paralelos em memória | Objetos (`Obra`, `Leitor`, `Emprestimo`) e listas |
+| Arrays paralelos em memória | Objetos (`Livro`, `Leitor`, `Emprestimo`) e listas |
 | `carregarDados()` (RF15) | `BancoDados.inicializar()` |
 | `salvarLivros()` etc. (RF16) | Cada operação grava na hora (com `commit`) |
 | `atrasos_dia<N>.txt` | `atrasos_AAAA-MM-DD.txt` (continua `.txt`, RF14) |
-| Validação de linhas na carga (RN17) | CHECKs, FKs e UNIQUEs no banco + `montarObra/montarLeitor` que revalidam ao ler |
+| Validação de linhas na carga (RN17) | CHECKs, FKs e UNIQUEs no banco + `montarLivro/montarLeitor` que revalidam ao ler |
 
 ---
 
@@ -1009,10 +1009,10 @@ Main
  └─ FrmLogin
         └─ (login ok) Sessao.setFuncionario(f) → FrmPrincipal
                ├─ Circulação:  FrmEmprestimo, FrmDevolucao, FrmReserva, FrmEmprestimosAbertos
-               ├─ Cadastros:   FrmObra (→ Listar: FrmConsultaObras), FrmAdicionarCopias,
+               ├─ Cadastros:   FrmLivro (→ Listar: FrmConsultaLivros), FrmAdicionarCopias,
                │               FrmLeitor (→ FrmConsultaLeitores),
                │               FrmFuncionario (→ FrmConsultaFuncionarios)  [só Bibliotecário]
-               ├─ Consultas:   FrmConsultaObras, FrmConsultaLeitores, FrmEmprestimosAbertos,
+               ├─ Consultas:   FrmConsultaLivros, FrmConsultaLeitores, FrmEmprestimosAbertos,
                │               FrmConsultaReservas
                ├─ Relatórios:  FrmRelCirculacao, FrmRelAtrasos, FrmRelPerfilUso, FrmExportarCobranca
                └─ Sistema:     FrmAlterarSenha, Tema escuro, Trocar usuário (→ FrmLogin), Sair
@@ -1037,11 +1037,11 @@ Main
 
 | RF | Descrição (PDF) | Tela | Regras / métodos principais |
 |---|---|---|---|
-| RF01 | Cadastrar livro | `FrmObra.inserir()` | `Obra.set*` (RN01–RN03), `obra.adicionarCopias` (RN04), `dao.contar()` (RN14), `ObraDAO.inserir` (transação) |
-| RF02 | Adicionar exemplares | `FrmAdicionarCopias.adicionar()` | `obra.adicionarCopias` (RN04), `CopiaDAO.adicionarCopias` (+ separa para a fila) |
-| RF03 | Listar acervo | `FrmConsultaObras` (todas) | `ObraDAO.listar(null)`, totais de títulos e exemplares |
-| RF04 | Consultar livro por código | `FrmObra.consultar()` / `mostrarFicha()` | `ObraDAO.carregar`, `EmprestimoDAO.listarAbertosPorObra`; "Livro não encontrado." |
-| RF05 | Pesquisar por categoria | `FrmConsultaObras` (combo) | `ObraDAO.listar(categoria)`; "Nenhum livro nesta categoria." |
+| RF01 | Cadastrar livro | `FrmLivro.inserir()` | `Livro.set*` (RN01–RN03), `livro.adicionarCopias` (RN04), `dao.contar()` (RN14), `LivroDAO.inserir` (transação) |
+| RF02 | Adicionar exemplares | `FrmAdicionarCopias.adicionar()` | `livro.adicionarCopias` (RN04), `CopiaDAO.adicionarCopias` (+ separa para a fila) |
+| RF03 | Listar acervo | `FrmConsultaLivros` (todas) | `LivroDAO.listar(null)`, totais de títulos e exemplares |
+| RF04 | Consultar livro por código | `FrmLivro.consultar()` / `mostrarFicha()` | `LivroDAO.carregar`, `EmprestimoDAO.listarAbertosPorLivro`; "Livro não encontrado." |
+| RF05 | Pesquisar por categoria | `FrmConsultaLivros` (combo) | `LivroDAO.listar(categoria)`; "Nenhum livro nesta categoria." |
 | RF06 | Cadastrar leitor | `FrmLeitor.inserir()` | `Leitor.criar`, `setCodigo` (RN05), `dao.existe`, `dao.contar` (RN14); mostra prazo e limite |
 | RF07 | Listar leitores | `FrmConsultaLeitores` | `LeitorDAO.listar()`, `getSituacao()` → "1 de 2" |
 | RF08 | Realizar empréstimo | `FrmEmprestimo.realizar()` | RN06–RN10, RN13–RN16 (ver 9.1) |
@@ -1058,20 +1058,20 @@ Main
 
 | RN | Regra | Onde está implementada |
 |---|---|---|
-| RN01 | Código do livro 100–9999, sem repetir | `Obra.setCodigo`; `FrmObra.inserir` (verifica se já existe); PK + CHECK no banco |
-| RN02 | Título e autor obrigatórios | `Validador.textoObrigatorio` via `Obra.setTitulo/setAutor`; CHECK `TRIM <> ''` |
-| RN03 | Categoria 1–5; ano 1450–ano atual | enum `Categoria` + `Obra.setCategoria`; `Obra.setAnoPublicacao`; CHECKs |
-| RN04 | Exemplares 1–50, todos começam disponíveis | `Obra.adicionarCopias`; `Copia.situacao = DISPONIVEL` por padrão |
+| RN01 | Código do livro 100–9999, sem repetir | `Livro.setCodigo`; `FrmLivro.inserir` (verifica se já existe); PK + CHECK no banco |
+| RN02 | Título e autor obrigatórios | `Validador.textoObrigatorio` via `Livro.setTitulo/setAutor`; CHECK `TRIM <> ''` |
+| RN03 | Categoria 1–5; ano 1450–ano atual | enum `Categoria` + `Livro.setCategoria`; `Livro.setAnoPublicacao`; CHECKs |
+| RN04 | Exemplares 1–50, todos começam disponíveis | `Livro.adicionarCopias`; `Copia.situacao = DISPONIVEL` por padrão |
 | RN05 | Código do leitor 1–9999, sem repetir; nome obrigatório; tipo 1–3 | `Leitor.setCodigo`; `Pessoa.setNome`; `Leitor.criar`; `LeitorDAO.existe`; CHECKs |
-| RN06 | Só empresta livro existente com exemplar disponível | `FrmEmprestimo` (obra == null → erro); `Obra.getCopiaParaEmprestimo` |
+| RN06 | Só empresta livro existente com exemplar disponível | `FrmEmprestimo` (livro == null → erro); `Livro.getCopiaParaEmprestimo` |
 | RN07 | Leitor existe e respeita o limite do tipo | `FrmEmprestimo` (leitor == null); `Leitor.atingiuLimite` com `getLimiteLivros()` polimórfico |
 | RN08 | Leitor com atraso não pega novo livro | `Leitor.getEmprestimoEmAtraso` em `validarNovoEmprestimo` |
-| RN09 | Não pode ter 2 empréstimos abertos do mesmo livro | `Leitor.possuiObraEmprestada` |
+| RN09 | Não pode ter 2 empréstimos abertos do mesmo livro | `Leitor.possuiLivroEmprestado` |
 | RN10 | Datas válidas; prevista = empréstimo + prazo do tipo | `Datas.converter` (formato estrito); `Leitor.calcularDataPrevista`; CHECK `data_prevista > data_emprestimo` |
 | RN11 | Só devolve empréstimo existente e aberto; data não anterior | `FrmDevolucao.buscar`; `Emprestimo.registrarDevolucao`; `Copia.devolver`; `UPDATE ... AND data_devolucao IS NULL`; CHECK no banco |
 | RN12 | Atraso = devolução (ou referência) − prevista, se positivo; multa = atraso × 0,50 | `Emprestimo.calcularDiasAtraso` (2 versões) e `calcularMulta` |
 | RN13 | Empréstimo: disponíveis −1, abertos do leitor +1, matriz +1; devolução: o inverso, matriz não muda | Disponíveis = cópias por situação (`Copia.emprestar/devolver`); abertos = `COUNT` dos empréstimos sem devolução; matriz = `GROUP BY` de todos os empréstimos |
-| RN14 | Máx. 200 títulos, 100 leitores, 500 empréstimos | `Constantes.MAX_*` + `dao.contar()` em `FrmObra.inserir`, `FrmLeitor.inserir`, `FrmEmprestimo.realizar` |
+| RN14 | Máx. 200 títulos, 100 leitores, 500 empréstimos | `Constantes.MAX_*` + `dao.contar()` em `FrmLivro.inserir`, `FrmLeitor.inserir`, `FrmEmprestimo.realizar` |
 | RN15 | Disponíveis entre 0 e o total | Garantido por construção: disponíveis é a contagem de cópias `DISPONIVEL`; transições controladas em `Copia` |
 | RN16 | Gravação imediata; sucesso só após gravar | DAOs gravam na hora; a `Mensagem.info` vem depois da chamada ao DAO; transações com `commit` |
 | RN17 | Na carga, dados válidos | Restrições do banco (CHECK/FK/UNIQUE) impedem gravar dado inválido; `DAO.montar*` revalida ao ler |
@@ -1084,16 +1084,16 @@ O PDF não trata reservas nem funcionários (é da disciplina de LP1). Essas reg
 | Regra | Descrição | Onde |
 |---|---|---|
 | R1 | Leitor com empréstimo atrasado não pode reservar | `Leitor.validarNovaReserva` |
-| R2 | Não pode reservar obra que já está com ele, nem ter 2 reservas vivas da mesma obra | `validarNovaReserva` + `UNIQUE(viva_leitor, viva_obra)` |
-| R3 | Só reserva se não houver cópia disponível ("faça o empréstimo") | `validarNovaReserva` (`obra.getQtdDisponiveis() > 0`) |
+| R2 | Não pode reservar livro que já está com ele, nem ter 2 reservas vivas da mesmo livro | `validarNovaReserva` + `UNIQUE(viva_leitor, viva_livro)` |
+| R3 | Só reserva se não houver cópia disponível ("faça o empréstimo") | `validarNovaReserva` (`livro.getQtdDisponiveis() > 0`) |
 | R4 | Quando uma cópia fica livre (devolução, novos exemplares, cancelamento, expiração), ela é separada para a 1ª reserva ATIVA da fila, que passa a AGUARDANDO com 3 dias para retirar | `ReservaDAO.atualizarFila`, `Reserva.separarCopia`, `Copia.reservar`, `Constantes.PRAZO_RETIRADA_RESERVA` |
-| R5 | Quando o leitor da reserva vem emprestar, usa a cópia separada e a reserva vira ATENDIDA | `Obra.getReservaAguardando`, `Obra.getCopiaParaEmprestimo`, `Reserva.atender`, `EmprestimoDAO.registrarEmprestimo` |
+| R5 | Quando o leitor da reserva vem emprestar, usa a cópia separada e a reserva vira ATENDIDA | `Livro.getReservaAguardando`, `Livro.getCopiaParaEmprestimo`, `Reserva.atender`, `EmprestimoDAO.registrarEmprestimo` |
 | R6 | Passou o prazo de retirada: reserva EXPIRADA e cópia vai para o próximo | `Reserva.prazoVencido/expirar`, `ReservaDAO.expirarVencidas` (chamado em `FrmEmprestimo` e `FrmReserva`) |
 | R7 | Cancelar reserva viva libera a cópia e anda a fila | `Reserva.cancelar`, `ReservaDAO.salvarCancelamento` |
 | Decisão | Reserva **não conta** no limite de empréstimos do leitor | `atingiuLimite()` só olha empréstimos |
 | F1 | Só Bibliotecário cadastra/altera/exclui funcionários | `Funcionario.podeGerenciarCadastros()` (polimórfico) em `FrmPrincipal` |
 | Extra | Sempre deve existir pelo menos 1 Bibliotecário; ninguém exclui o próprio usuário; quem já teve movimentação não é excluído | `FrmFuncionario.alterar/excluir`, `FuncionarioDAO.contarBibliotecarios/possuiMovimentacao` |
-| Extra | Obra ou leitor com histórico não pode ser excluído (preserva os relatórios) | `ObraDAO/LeitorDAO.possuiMovimentacao` |
+| Extra | Livro ou leitor com histórico não pode ser excluído (preserva os relatórios) | `LivroDAO/LeitorDAO.possuiMovimentacao` |
 
 ---
 
@@ -1182,10 +1182,10 @@ Nas transações, o DAO captura a `SQLException` **só para desfazer** (`conn.ro
 2. `Datas.converter(txtData)` → `LocalDate` (data inválida → erro).
 3. `reservaDAO.expirarVencidas(data)`: antes de tudo, expira reservas vencidas e libera cópias (R6).
 4. `leitorDAO.carregar(codigo)`: vem o objeto **já da subclasse certa** e com a lista de empréstimos abertos. `null` → "Leitor não encontrado." (RN07).
-5. `obraDAO.carregar(codigo)`: obra com cópias e fila. `null` → "Livro não encontrado." (RN06).
-6. `leitor.validarNovoEmprestimo(obra, data)`: RN07, RN08, RN09.
-7. `obra.getReservaAguardando(leitor)`: se ele tinha reserva com cópia separada (R5).
-8. `obra.getCopiaParaEmprestimo(leitor)`: cópia separada para ele ou a primeira disponível; nenhuma → erro (RN06).
+5. `livroDAO.carregar(codigo)`: livro com cópias e fila. `null` → "Livro não encontrado." (RN06).
+6. `leitor.validarNovoEmprestimo(livro, data)`: RN07, RN08, RN09.
+7. `livro.getReservaAguardando(leitor)`: se ele tinha reserva com cópia separada (R5).
+8. `livro.getCopiaParaEmprestimo(leitor)`: cópia separada para ele ou a primeira disponível; nenhuma → erro (RN06).
 9. `new Emprestimo(copia, leitor, Sessao.getFuncionario(), data)`: `copia.emprestar()` e `dataPrevista` **polimórfica** (RN10).
 10. `emprestimoDAO.registrarEmprestimo(emp, reserva)`: transação com INSERT do empréstimo, UPDATE da cópia e da reserva (RN13, RN16).
 11. Só depois: `Mensagem.info("Empréstimo nº X registrado (exemplar 101-2). Devolução prevista para dd/mm/aaaa.")`.
@@ -1202,10 +1202,10 @@ Qualquer `throw` em qualquer passo pula direto para o `catch` → `Mensagem.erro
 ## 9.3 Reservar, `FrmReserva.reservar()`
 
 1. Converte a data e expira vencidas.
-2. Carrega leitor e obra (erros se não existirem).
-3. `leitor.validarNovaReserva(obra, data)` (R1–R3).
-4. `new Reserva(obra, leitor, funcionarioLogado, data)` → `dao.inserir(reserva)`.
-5. Mensagem com a posição na fila (`obra.getPosicaoNaFila(reserva)`).
+2. Carrega leitor e livro (erros se não existirem).
+3. `leitor.validarNovaReserva(livro, data)` (R1–R3).
+4. `new Reserva(livro, leitor, funcionarioLogado, data)` → `dao.inserir(reserva)`.
+5. Mensagem com a posição na fila (`livro.getPosicaoNaFila(reserva)`).
 
 ## 9.4 Cancelar reserva, `FrmReserva.cancelar()`
 
@@ -1217,11 +1217,12 @@ Qualquer `throw` em qualquer passo pula direto para o `catch` → `Mensagem.erro
 
 ## 9.6 Inicialização (RF15), `BancoDados.inicializar()`
 
-1. Cria as tabelas na ordem `obra → copia → leitor → funcionario → emprestimo → reserva` (cada FK precisa que a tabela referenciada já exista).
-2. `garantirAdministrador()`.
-3. Conta obras, leitores e empréstimos; avisa se estão vazios.
-4. `copiaDAO.verificarConsistencia()` (RN18).
-5. Resumo: "Dados carregados: X obra(s), Y cópia(s), Z leitor(es), W empréstimo(s). Próximo código de empréstimo: N."
+1. `livroDAO.migrarTabelaObra()`: se o banco ainda tem a tabela antiga `obra` (de antes da troca do nome para "Livro"), renomeia `obra` → `livro` e as colunas `obra_codigo` → `livro_codigo` em `copia` e `reserva`, sem perder dados. Em banco novo não faz nada.
+2. Cria as tabelas na ordem `livro → copia → leitor → funcionario → emprestimo → reserva` (cada FK precisa que a tabela referenciada já exista).
+3. `garantirAdministrador()`.
+4. Conta livros, leitores e empréstimos; avisa se estão vazios.
+5. `copiaDAO.verificarConsistencia()` (RN18).
+6. Resumo: "Dados carregados: X livro(s), Y cópia(s), Z leitor(es), W empréstimo(s). Próximo código de empréstimo: N."
 
 ---
 
@@ -1236,7 +1237,7 @@ Em três hierarquias: `Pessoa` → `Leitor`/`Funcionario`; `Leitor` → `Estudan
 No construtor de `Emprestimo`: `this.dataPrevista = leitor.calcularDataPrevista(dataEmprestimo);`. O método chama `getPrazoDias()`, que é abstrato em `Leitor` e implementado em cada subclasse. Se o objeto é `Professor`, soma 14 dias; se é `Estudante`, 7. Não tem `if` por tipo. O mesmo vale para `podeGerenciarCadastros()` na tela principal.
 
 **3. Qual a diferença entre sobrescrita e sobrecarga? Tem as duas?**
-Sobrescrita (`@Override`) é a subclasse redefinir um método da mãe, com a mesma assinatura, e é resolvida em tempo de execução (ex.: `getPrazoDias()`, `setCodigo` em `Leitor`, `toString`). Sobrecarga é ter métodos com o mesmo nome e parâmetros diferentes na mesma classe, resolvida em compilação (ex.: `calcularDiasAtraso()` e `calcularDiasAtraso(LocalDate)`; `ObraDAO.carregar(int)` e `carregar(Connection, int)`).
+Sobrescrita (`@Override`) é a subclasse redefinir um método da mãe, com a mesma assinatura, e é resolvida em tempo de execução (ex.: `getPrazoDias()`, `setCodigo` em `Leitor`, `toString`). Sobrecarga é ter métodos com o mesmo nome e parâmetros diferentes na mesma classe, resolvida em compilação (ex.: `calcularDiasAtraso()` e `calcularDiasAtraso(LocalDate)`; `LivroDAO.carregar(int)` e `carregar(Connection, int)`).
 
 **4. Por que `Leitor` é abstrata?**
 Porque não existe um leitor "genérico" na biblioteca: todo leitor é Estudante, Professor ou Comunidade, e cada um tem prazo e limite diferentes. Ser abstrata impede `new Leitor()` e obriga as subclasses a implementar `getPrazoDias()`, `getLimiteLivros()` e `getTipo()`.
@@ -1245,10 +1246,10 @@ Porque não existe um leitor "genérico" na biblioteca: todo leitor é Estudante
 Porque as subclasses compartilham **estado e código**: atributos (`codigo`, `nome`, `emprestimosAbertos`) e métodos prontos (`validarNovoEmprestimo`, `calcularDataPrevista`). Interface define só o contrato, não guarda atributos de instância. Usamos interfaces do Java onde faziam sentido: `List`, `Map`, `Supplier`, `ActionListener` (lambdas), e as interfaces do JDBC.
 
 **6. Explique a diferença entre associação, agregação e composição no projeto.**
-Composição: `Obra` e `Copia`. A cópia é criada pela obra (`adicionarCopias`), só existe com ela e é apagada junto. Agregação: `Leitor` tem a lista de `Emprestimo` em aberto e `Obra` tem a fila de `Reserva`, mas empréstimos e reservas têm vida própria (ficam no histórico). Associação: `Emprestimo` referencia `Copia`, `Leitor` e `Funcionario`, sem ser dono deles.
+Composição: `Livro` e `Copia`. A cópia é criada pelo livro (`adicionarCopias`), só existe com ele e é apagada junto. Agregação: `Leitor` tem a lista de `Emprestimo` em aberto e `Livro` tem a fila de `Reserva`, mas empréstimos e reservas têm vida própria (ficam no histórico). Associação: `Emprestimo` referencia `Copia`, `Leitor` e `Funcionario`, sem ser dono deles.
 
 **7. Onde está o encapsulamento?**
-Todos os atributos são `private`. Os setters validam as regras (ex.: `Obra.setCodigo` só aceita 100 a 9999). A situação da cópia muda por métodos de negócio (`emprestar`, `devolver`), que impedem transições erradas. A senha nunca é guardada em texto puro.
+Todos os atributos são `private`. Os setters validam as regras (ex.: `Livro.setCodigo` só aceita 100 a 9999). A situação da cópia muda por métodos de negócio (`emprestar`, `devolver`), que impedem transições erradas. A senha nunca é guardada em texto puro.
 
 **8. O que é o método `criar` em `Leitor` e `Funcionario`?**
 Um método fábrica estático. Recebe o tipo (1, 2, 3) e devolve o objeto da subclasse correta, com retorno do tipo da superclasse. As telas e os DAOs não precisam saber qual subclasse instanciar.
@@ -1271,7 +1272,7 @@ Data Access Object: uma classe responsável só pelo acesso ao banco de uma enti
 Para não repetir em cada DAO a leitura do `db.properties`, o `getConnection()`, a conversão de datas e a montagem de objetos. E para obrigar cada DAO a ter `criarNovaTabela()`.
 
 **14. Como vocês evitam SQL Injection?**
-Usando `PreparedStatement` com `?` em todo lugar onde entra texto do usuário. Nos poucos lugares em que o SQL é concatenado (filtros em `EmprestimoDAO.consultar` e `ObraDAO.listar`), os valores são `int` ou `LocalDate` gerados pelo próprio programa, nunca texto digitado.
+Usando `PreparedStatement` com `?` em todo lugar onde entra texto do usuário. Nos poucos lugares em que o SQL é concatenado (filtros em `EmprestimoDAO.consultar` e `LivroDAO.listar`), os valores são `int` ou `LocalDate` gerados pelo próprio programa, nunca texto digitado.
 
 **15. O que acontece se der erro no meio de um empréstimo?**
 O empréstimo grava em três tabelas (emprestimo, copia e, se for o caso, reserva) numa **transação**. Se qualquer comando falhar, o `catch` faz `rollback()` e nada fica gravado pela metade. A exceção sobe para a tela, que mostra "Erro no banco de dados. Os dados não foram gravados."
@@ -1335,7 +1336,7 @@ Vale conhecer para não ser pego de surpresa (e, se quiser, corrigir antes da ap
 
 1. **Cores da tela "Empréstimos em aberto" (corrigido em 27/11/2026).** O renderer usava `Color.BLACK` e o texto sumia no tema escuro. Agora, quando a linha não está selecionada, usa `Estilo.VERMELHO` para os atrasados e `t.getForeground()` (a cor do tema) para os demais; linha selecionada mantém a cor de seleção.
 2. **Não há interface (`interface`) própria.** Prepare a resposta da pergunta 5 da Parte 10.
-3. **Concatenação em alguns SQL.** `EmprestimoDAO.consultar` e `ObraDAO.listar` concatenam filtros. Não é falha de segurança (são números e datas do próprio programa), mas o professor pode perguntar (pergunta 14).
+3. **Concatenação em alguns SQL.** `EmprestimoDAO.consultar` e `LivroDAO.listar` concatenam filtros. Não é falha de segurança (são números e datas do próprio programa), mas o professor pode perguntar (pergunta 14).
 4. **Datas futuras são aceitas** no empréstimo e na devolução (por exemplo, para simular atrasos na demonstração). Isso é útil na apresentação, mas convém saber explicar.
 5. **Capacidade (RN14) conta todos os empréstimos já feitos**, não só os abertos, igual ao `qtdEmprestimos` do PDF.
 6. **Reserva não conta no limite** do leitor. Foi uma decisão do projeto.

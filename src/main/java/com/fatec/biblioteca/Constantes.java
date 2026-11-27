@@ -8,7 +8,7 @@ public final class Constantes {
     private Constantes() {
     }
 
-    public static final int MAX_OBRAS = 200;        // RN14 (MAX_LIVROS)
+    public static final int MAX_LIVROS = 200;       // RN14
     public static final int MAX_LEITORES = 100;     // RN14
     public static final int MAX_EMPRESTIMOS = 500;  // RN14
 

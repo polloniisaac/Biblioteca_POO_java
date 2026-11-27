@@ -12,20 +12,20 @@ import java.util.List;
 import com.fatec.biblioteca.Copia;
 import com.fatec.biblioteca.Emprestimo;
 import com.fatec.biblioteca.Leitor;
-import com.fatec.biblioteca.Obra;
+import com.fatec.biblioteca.Livro;
 import com.fatec.biblioteca.PerfilUso;
 import com.fatec.biblioteca.Reserva;
 import com.fatec.biblioteca.SituacaoCopia;
 
 public class EmprestimoDAO extends DAO {
 
-    private static final String SELECT = "SELECT e.*, c.numero, c.situacao AS copia_situacao, c.obra_codigo,"
+    private static final String SELECT = "SELECT e.*, c.numero, c.situacao AS copia_situacao, c.livro_codigo,"
             + " o.titulo, o.autor, o.categoria, o.ano_publicacao,"
             + " l.nome AS leitor_nome, l.tipo AS leitor_tipo,"
             + " fe.nome AS fe_nome, fe.cargo AS fe_cargo, fd.nome AS fd_nome, fd.cargo AS fd_cargo"
             + " FROM emprestimo e"
             + " JOIN copia c ON c.codigo = e.copia_codigo"
-            + " JOIN obra o ON o.codigo = c.obra_codigo"
+            + " JOIN livro o ON o.codigo = c.livro_codigo"
             + " JOIN leitor l ON l.codigo = e.leitor_codigo"
             + " JOIN funcionario fe ON fe.codigo = e.funcionario_emprestimo"
             + " LEFT JOIN funcionario fd ON fd.codigo = e.funcionario_devolucao";
@@ -102,7 +102,7 @@ public class EmprestimoDAO extends DAO {
                     throw new SQLException("O empréstimo " + emp.getCodigo() + " já foi devolvido.");
                 }
                 new CopiaDAO().atualizarSituacao(conn, emp.getCopia());
-                List<Reserva> separadas = new ReservaDAO().atualizarFila(conn, emp.getObra().getCodigo(),
+                List<Reserva> separadas = new ReservaDAO().atualizarFila(conn, emp.getLivro().getCodigo(),
                         emp.getDataDevolucao());
                 conn.commit();
                 return separadas;
@@ -124,9 +124,9 @@ public class EmprestimoDAO extends DAO {
                 + " ORDER BY e.data_prevista", leitor);
     }
 
-    // RF04: empréstimos em aberto de uma obra.
-    public List<Emprestimo> listarAbertosPorObra(int codigoObra) throws SQLException {
-        return consultar(" WHERE e.data_devolucao IS NULL AND c.obra_codigo = " + codigoObra
+    // RF04: empréstimos em aberto de um livro.
+    public List<Emprestimo> listarAbertosPorLivro(int codigoLivro) throws SQLException {
+        return consultar(" WHERE e.data_devolucao IS NULL AND c.livro_codigo = " + codigoLivro
                 + " ORDER BY e.codigo", null);
     }
 
@@ -156,7 +156,7 @@ public class EmprestimoDAO extends DAO {
         String sql = "SELECT l.tipo, o.categoria, COUNT(*) AS qtd FROM emprestimo e"
                 + " JOIN leitor l ON l.codigo = e.leitor_codigo"
                 + " JOIN copia c ON c.codigo = e.copia_codigo"
-                + " JOIN obra o ON o.codigo = c.obra_codigo"
+                + " JOIN livro o ON o.codigo = c.livro_codigo"
                 + " GROUP BY l.tipo, o.categoria";
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
@@ -196,13 +196,13 @@ public class EmprestimoDAO extends DAO {
     }
 
     private Emprestimo montar(ResultSet rs, Leitor leitorConhecido) throws SQLException {
-        Obra obra = montarObra(rs.getInt("obra_codigo"), rs.getString("titulo"), rs.getString("autor"),
+        Livro livro = montarLivro(rs.getInt("livro_codigo"), rs.getString("titulo"), rs.getString("autor"),
                 rs.getInt("categoria"), rs.getInt("ano_publicacao"));
         Copia copia = new Copia();
         copia.setCodigo(rs.getInt("copia_codigo"));
         copia.setNumero(rs.getInt("numero"));
         copia.setSituacao(SituacaoCopia.valueOf(rs.getString("copia_situacao")));
-        obra.adicionarCopiaCarregada(copia);
+        livro.adicionarCopiaCarregada(copia);
 
         Emprestimo e = new Emprestimo();
         e.setCodigo(rs.getInt("codigo"));

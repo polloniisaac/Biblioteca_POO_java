@@ -15,19 +15,19 @@ import javax.swing.JTextField;
 import com.fatec.biblioteca.Constantes;
 import com.fatec.biblioteca.Datas;
 import com.fatec.biblioteca.Leitor;
-import com.fatec.biblioteca.Obra;
+import com.fatec.biblioteca.Livro;
 import com.fatec.biblioteca.Reserva;
 import com.fatec.biblioteca.Sessao;
 import com.fatec.biblioteca.Validador;
 import com.fatec.biblioteca.dao.LeitorDAO;
-import com.fatec.biblioteca.dao.ObraDAO;
+import com.fatec.biblioteca.dao.LivroDAO;
 import com.fatec.biblioteca.dao.ReservaDAO;
 
-// Reservar obra sem exemplar disponível e cancelar reserva (regras R1–R7).
+// Reservar livro sem exemplar disponível e cancelar reserva (regras R1–R7).
 public class FrmReserva extends JFrame {
 
     private JTextField txtLeitor;
-    private JTextField txtObra;
+    private JTextField txtLivro;
     private JTextField txtData;
     private JTextField txtCodigoReserva;
 
@@ -36,13 +36,13 @@ public class FrmReserva extends JFrame {
     private JButton btnListar;
 
     private LeitorDAO leitorDAO;
-    private ObraDAO obraDAO;
+    private LivroDAO livroDAO;
     private ReservaDAO dao;
 
     public FrmReserva() {
 
         leitorDAO = new LeitorDAO();
-        obraDAO = new ObraDAO();
+        livroDAO = new LivroDAO();
         dao = new ReservaDAO();
 
         setTitle("Reservas");
@@ -56,8 +56,8 @@ public class FrmReserva extends JFrame {
         txtLeitor = new JTextField();
         painel.add(txtLeitor);
         painel.add(new JLabel("Código do livro"));
-        txtObra = new JTextField();
-        painel.add(txtObra);
+        txtLivro = new JTextField();
+        painel.add(txtLivro);
         painel.add(new JLabel("Data (dd/mm/aaaa)"));
         txtData = new JTextField(Datas.hoje());
         painel.add(txtData);
@@ -93,17 +93,17 @@ public class FrmReserva extends JFrame {
             if (leitor == null) {
                 throw new Exception("Leitor não encontrado.");
             }
-            Obra obra = obraDAO.carregar(Validador.inteiro(txtObra.getText(), "Código do livro"));
-            if (obra == null) {
+            Livro livro = livroDAO.carregar(Validador.inteiro(txtLivro.getText(), "Código do livro"));
+            if (livro == null) {
                 throw new Exception("Livro não encontrado.");
             }
-            leitor.validarNovaReserva(obra, data);   // R1, R2, R3
-            Reserva reserva = new Reserva(obra, leitor, Sessao.getFuncionario(), data);
+            leitor.validarNovaReserva(livro, data);   // R1, R2, R3
+            Reserva reserva = new Reserva(livro, leitor, Sessao.getFuncionario(), data);
             dao.inserir(reserva);
             Mensagem.info(this, "Reserva nº " + reserva.getCodigo() + " registrada para " + leitor.getNome()
-                    + ".\nPosição na fila: " + obra.getPosicaoNaFila(reserva) + "º.");
+                    + ".\nPosição na fila: " + livro.getPosicaoNaFila(reserva) + "º.");
             txtLeitor.setText("");
-            txtObra.setText("");
+            txtLivro.setText("");
         } catch (Exception err) {
             Mensagem.erro(this, err);
         }
@@ -118,7 +118,7 @@ public class FrmReserva extends JFrame {
                 throw new Exception("Reserva não encontrada ou já encerrada.");
             }
             if (!Mensagem.confirmar(this, "Cancelar a reserva nº " + codigo + " de " + r.getLeitor().getNome()
-                    + " (" + r.getObra().getTitulo() + ")?")) {
+                    + " (" + r.getLivro().getTitulo() + ")?")) {
                 return;
             }
             r.cancelar();                                            // R7

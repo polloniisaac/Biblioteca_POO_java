@@ -151,7 +151,7 @@ public class FrmLeitor extends JFrame {
             sb.append("  (nenhum)\n");
         }
         for (Emprestimo e : l.getEmprestimosAbertos()) {
-            sb.append(String.format("  nº %-4d %-30s previsto %s%n", e.getCodigo(), e.getObra().getTitulo(),
+            sb.append(String.format("  nº %-4d %-30s previsto %s%n", e.getCodigo(), e.getLivro().getTitulo(),
                     Datas.formatar(e.getDataPrevista())));
         }
         txtSituacao.setText(sb.toString());
