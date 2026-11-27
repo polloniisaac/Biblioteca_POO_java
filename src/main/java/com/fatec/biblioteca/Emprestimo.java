@@ -36,18 +36,18 @@ public class Emprestimo {
         return dataDevolucao == null;
     }
 
-    //RN12 usando a data da devolução (empréstimo já devolvido).
+    // RN12 usando a data da devolução (empréstimo já devolvido).
     public int calcularDiasAtraso() {
         return dataDevolucao == null ? 0 : calcularDiasAtraso(dataDevolucao);
     }
 
-    //RN12 usando uma data de referência (sobrecarga).
+    // RN12 usando uma data de referência (sobrecarga).
     public int calcularDiasAtraso(LocalDate dataReferencia) {
         long dias = ChronoUnit.DAYS.between(dataPrevista, dataReferencia);
         return dias > 0 ? (int) dias : 0;
     }
 
-    //RN12: multa = dias de atraso x MULTA_POR_DIA
+    // RN12: multa = dias de atraso x MULTA_POR_DIA
     public double calcularMulta(LocalDate dataReferencia) {
         return calcularDiasAtraso(dataReferencia) * Constantes.MULTA_POR_DIA;
     }
